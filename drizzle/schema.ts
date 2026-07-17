@@ -1,5 +1,18 @@
-import { int, mysqlEnum, mysqlTable, text, timestamp, varchar } from "drizzle-orm/mysql-core";
+import {
+  customType,
+  int,
+  mysqlEnum,
+  mysqlTable,
+  text,
+  timestamp,
+  varchar,
+} from "drizzle-orm/mysql-core";
 
+const longText = customType<{ data: string }>({
+  dataType() {
+    return "longtext";
+  },
+});
 /**
  * Core user table backing auth flow.
  */
@@ -24,16 +37,16 @@ export type InsertUser = typeof users.$inferInsert;
 export const reviews = mysqlTable("reviews", {
   id: int("id").autoincrement().primaryKey(),
   legacyId: varchar("legacyId", { length: 255 }).unique(),
-  slug: varchar("slug", { length: 190 }).unique(),
+  slug: varchar("slug", { length: 190 }),
   title: varchar("title", { length: 255 }).notNull(),
   author: varchar("author", { length: 255 }).notNull(),
   genre: varchar("genre", { length: 255 }),
   labels: text("labels"),
   reviewDate: timestamp("reviewDate").notNull(),
-  content: text("content").notNull(),
-  coverImageUrl: varchar("coverImageUrl", { length: 512 }),
-  purchaseLink: varchar("purchaseLink", { length: 512 }),
-  sourceUrl: varchar("sourceUrl", { length: 512 }),
+  content: longText("content").notNull(),
+  coverImageUrl: longText("coverImageUrl"),
+  purchaseLink: text("purchaseLink"),
+  sourceUrl: text("sourceUrl"),
   excerpt: text("excerpt"),
   createdAt: timestamp("createdAt").defaultNow().notNull(),
   updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),

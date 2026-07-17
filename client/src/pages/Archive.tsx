@@ -1,186 +1,250 @@
-import { useState, useMemo } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { Link } from "wouter";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
-import { Loader2, BookOpen, ArrowRight, Calendar, ChevronRight } from "lucide-react";
+import {
+  ArrowRight,
+  BookOpen,
+  Calendar,
+  ChevronLeft,
+  ChevronRight,
+  Loader2,
+} from "lucide-react";
 import { trpc } from "@/lib/trpc";
 
 const MONTHS = [
-  "Janeiro", "Fevereiro", "Março", "Abril", "Maio", "Junho",
-  "Julho", "Agosto", "Setembro", "Outubro", "Novembro", "Dezembro"
+  "Janeiro",
+  "Fevereiro",
+  "Março",
+  "Abril",
+  "Maio",
+  "Junho",
+  "Julho",
+  "Agosto",
+  "Setembro",
+  "Outubro",
+  "Novembro",
+  "Dezembro",
 ];
 
-const ALL_YEARS = Array.from({ length: 2026 - 2011 + 1 }, (_, i) => 2026 - i);
-
 function formatDate(date: Date | string) {
-  return new Date(date).toLocaleDateString("pt-BR", { day: "2-digit", month: "long", year: "numeric" });
+  return new Date(date).toLocaleDateString("pt-BR", {
+    day: "2-digit",
+    month: "long",
+    year: "numeric",
+  });
+}
+
+function ImageFallback({ title }: { title: string }) {
+  return (
+    <div className="archive-cover-fallback" aria-label={`Sem capa para ${title}`}>
+      <BookOpen className="h-8 w-8" />
+      <span>{title.slice(0, 1)}</span>
+    </div>
+  );
 }
 
 export default function Archive() {
+  const { data: years = [], isLoading: loadingYears } =
+    trpc.reviews.years.useQuery();
+  const { data: stats } = trpc.reviews.stats.useQuery();
+
   const [selectedYear, setSelectedYear] = useState<number | null>(null);
   const [selectedMonth, setSelectedMonth] = useState<number | null>(null);
 
-  const queryInput = useMemo(() => {
-    if (selectedYear !== null) {
-      return { year: selectedYear, month: selectedMonth ?? undefined };
+  useEffect(() => {
+    if (selectedYear === null && years.length > 0) {
+      setSelectedYear(years[0]);
     }
-    return undefined;
-  }, [selectedYear, selectedMonth]);
+  }, [years, selectedYear]);
 
-  const { data: reviewsData, isLoading } = trpc.reviews.byYearMonth.useQuery(
-    queryInput ?? { year: 0 },
-    { enabled: selectedYear !== null }
+  const queryInput = useMemo(
+    () => ({ year: selectedYear ?? 0, month: selectedMonth ?? undefined }),
+    [selectedYear, selectedMonth],
   );
 
-  const reviews = reviewsData ?? [];
+  const { data: reviews = [], isLoading } =
+    trpc.reviews.byYearMonth.useQuery(queryInput, {
+      enabled: selectedYear !== null,
+    });
 
-  const handleYearClick = (year: number) => {
-    if (selectedYear === year) {
-      setSelectedYear(null);
-      setSelectedMonth(null);
-    } else {
-      setSelectedYear(year);
-      setSelectedMonth(null);
-    }
-  };
+  const currentYearIndex = selectedYear ? years.indexOf(selectedYear) : -1;
+  const olderYear = currentYearIndex >= 0 ? years[currentYearIndex + 1] : undefined;
+  const newerYear = currentYearIndex > 0 ? years[currentYearIndex - 1] : undefined;
 
-  const handleMonthClick = (month: number) => {
-    setSelectedMonth(selectedMonth === month ? null : month);
+  const selectYear = (year: number) => {
+    setSelectedYear(year);
+    setSelectedMonth(null);
   };
 
   return (
-    <div className="flex flex-col">
-      {/* Hero */}
-      <section className="relative bg-gradient-to-br from-primary via-primary to-[oklch(0.25_0.10_285)] text-primary-foreground py-20 px-4 sm:px-6 lg:px-8">
-        <div className="absolute inset-0 opacity-10">
-          <div className="absolute top-10 right-20 w-72 h-72 rounded-full bg-accent blur-3xl" />
-        </div>
-        <div className="relative max-w-4xl mx-auto text-center space-y-4">
-          <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-accent/20 border border-accent/30 backdrop-blur-sm">
-            <Calendar className="w-3.5 h-3.5 text-accent" />
-            <span className="text-xs font-medium tracking-widest uppercase text-accent">Navegação Temporal</span>
+    <div className="editorial-page flex flex-col">
+      <section className="editorial-internal-hero archive-cinema-hero relative overflow-hidden px-4 py-20 text-white sm:px-6 lg:px-8">
+        <div className="cinema-grain absolute inset-0" />
+        <div className="relative z-10 mx-auto grid max-w-7xl gap-10 lg:grid-cols-[1fr_auto] lg:items-end">
+          <div>
+            <p className="eyebrow !text-gold">Arquivo editorial · desde 2011</p>
+            <h1 className="mt-5 max-w-4xl font-serif text-[clamp(4rem,9vw,8.8rem)] font-medium leading-[.82] tracking-[-.065em]">
+              Quinze anos de memória literária.
+            </h1>
           </div>
-          <h1 className="font-serif text-5xl md:text-6xl font-bold">Acervo Histórico</h1>
-          <p className="text-xl text-primary-foreground/80 max-w-2xl mx-auto">
-            Explore todas as resenhas publicadas desde 2011. Navegue por ano e mês para encontrar leituras do seu interesse.
-          </p>
+          <div className="max-w-sm border-l border-white/15 pl-7 pb-2">
+            <p className="text-sm leading-7 text-white/60">
+              Um acervo vivo de resenhas, primeiras impressões, ensaios e
+              encontros com histórias — organizado para ser explorado, não
+              apenas arquivado.
+            </p>
+            <div className="mt-7 flex gap-8">
+              <div>
+                <strong className="block font-serif text-3xl font-normal text-gold">
+                  {stats?.total ?? "—"}
+                </strong>
+                <span className="text-[10px] uppercase tracking-[.18em] text-white/40">
+                  publicações
+                </span>
+              </div>
+              <div>
+                <strong className="block font-serif text-3xl font-normal text-gold">
+                  {years.length || "—"}
+                </strong>
+                <span className="text-[10px] uppercase tracking-[.18em] text-white/40">
+                  anos catalogados
+                </span>
+              </div>
+            </div>
+          </div>
         </div>
       </section>
 
-      {/* Archive Navigation */}
-      <section className="py-16 px-4 sm:px-6 lg:px-8">
-        <div className="max-w-6xl mx-auto">
-          <div className="grid md:grid-cols-12 gap-8">
-            {/* Year & Month Navigation */}
-            <div className="md:col-span-4 space-y-6">
-              <div>
-                <h2 className="font-serif text-xl font-bold text-foreground mb-4">Anos</h2>
-                <div className="flex flex-wrap gap-2">
-                  {ALL_YEARS.map((year) => (
-                    <Button
-                      key={year}
-                      variant={selectedYear === year ? "default" : "outline"}
-                      size="sm"
-                      className="rounded-lg"
-                      onClick={() => handleYearClick(year)}
-                    >
-                      {year}
-                    </Button>
-                  ))}
-                </div>
-              </div>
+      <section className="archive-experience bg-background">
+        <div className="archive-year-rail border-b border-border">
+          <div className="container flex items-center gap-2 overflow-x-auto py-0 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
+            {loadingYears ? (
+              <Loader2 className="my-6 h-5 w-5 animate-spin" />
+            ) : (
+              years.map((year) => (
+                <button
+                  key={year}
+                  type="button"
+                  onClick={() => selectYear(year)}
+                  className={`archive-year-button ${
+                    selectedYear === year ? "is-active" : ""
+                  }`}
+                >
+                  {year}
+                </button>
+              ))
+            )}
+          </div>
+        </div>
 
-              {selectedYear !== null && (
-                <div className="space-y-3 pt-4 border-t border-border/50">
-                  <h3 className="font-serif text-lg font-semibold text-foreground">Meses de {selectedYear}</h3>
-                  <div className="grid grid-cols-3 gap-2">
-                    {MONTHS.map((month, idx) => (
-                      <Button
-                        key={month}
-                        variant={selectedMonth === idx + 1 ? "default" : "ghost"}
-                        size="sm"
-                        className="rounded-lg text-xs"
-                        onClick={() => handleMonthClick(idx + 1)}
-                      >
-                        {month.substring(0, 3)}
-                      </Button>
-                    ))}
-                  </div>
-                  {selectedMonth !== null && (
-                    <Button
-                      variant="ghost"
-                      size="sm"
-                      className="text-xs text-muted-foreground"
-                      onClick={() => setSelectedMonth(null)}
-                    >
-                      Ver todas de {selectedYear}
-                    </Button>
-                  )}
-                </div>
-              )}
+        <div className="container py-10 md:py-14">
+          <div className="archive-month-bar">
+            <button
+              type="button"
+              className={`archive-month-button ${selectedMonth === null ? "is-active" : ""}`}
+              onClick={() => setSelectedMonth(null)}
+            >
+              Ano completo
+            </button>
+            {MONTHS.map((month, index) => (
+              <button
+                key={month}
+                type="button"
+                className={`archive-month-button ${
+                  selectedMonth === index + 1 ? "is-active" : ""
+                }`}
+                onClick={() =>
+                  setSelectedMonth(selectedMonth === index + 1 ? null : index + 1)
+                }
+              >
+                {month.slice(0, 3)}
+              </button>
+            ))}
+          </div>
+
+          <div className="mt-12 flex flex-col gap-6 border-b border-border pb-8 md:flex-row md:items-end md:justify-between">
+            <div>
+              <p className="eyebrow">
+                {selectedMonth
+                  ? `${MONTHS[selectedMonth - 1]} · ${selectedYear}`
+                  : `Edição anual · ${selectedYear ?? ""}`}
+              </p>
+              <h2 className="mt-3 font-serif text-[clamp(3rem,6vw,6rem)] font-medium leading-none tracking-[-.055em]">
+                {reviews.length} histórias encontradas.
+              </h2>
             </div>
-
-            {/* Reviews List */}
-            <div className="md:col-span-8">
-              {selectedYear === null ? (
-                <div className="text-center py-20 space-y-4">
-                  <BookOpen className="w-16 h-16 text-muted-foreground/30 mx-auto" />
-                  <div>
-                    <p className="text-xl text-foreground font-medium">Selecione um ano</p>
-                    <p className="text-sm text-muted-foreground mt-1">Escolha um ano à esquerda para visualizar as resenhas daquele período.</p>
-                  </div>
-                </div>
-              ) : isLoading ? (
-                <div className="flex items-center justify-center py-20">
-                  <Loader2 className="w-8 h-8 animate-spin text-primary" />
-                </div>
-              ) : reviews.length === 0 ? (
-                <div className="text-center py-20 space-y-4">
-                  <BookOpen className="w-16 h-16 text-muted-foreground/30 mx-auto" />
-                  <div>
-                    <p className="text-xl text-foreground font-medium">Nenhuma resenha encontrada</p>
-                    <p className="text-sm text-muted-foreground mt-1">
-                      {selectedMonth !== null
-                        ? `Não há resenhas em ${MONTHS[selectedMonth - 1]} de ${selectedYear}.`
-                        : `Não há resenhas registradas para ${selectedYear}.`}
-                    </p>
-                  </div>
-                </div>
-              ) : (
-                <div className="space-y-4">
-                  <div className="flex items-center gap-2 text-sm text-muted-foreground mb-2">
-                    <span>Mostrando</span>
-                    <Badge variant="secondary" className="rounded">
-                      {reviews.length} resenha(s)
-                    </Badge>
-                    {selectedMonth !== null && (
-                      <span>em {MONTHS[selectedMonth - 1]} de {selectedYear}</span>
-                    )}
-                    {selectedMonth === null && <span>em {selectedYear}</span>}
-                  </div>
-                  {reviews.map((review) => (
-                    <Link key={review.id} href={`/resenhas/${review.id}`} className="block">
-                      <Card className="group flex flex-row items-center gap-4 p-4 card-hover cursor-pointer border-border/50 hover:border-primary/30">
-                        {review.coverImageUrl && (
-                          <div className="flex-shrink-0 w-16 h-24 rounded overflow-hidden bg-muted">
-                            <img src={review.coverImageUrl} alt={`Capa: ${review.title}`} className="w-full h-full object-cover" />
-                          </div>
-                        )}
-                        <div className="flex-1 min-w-0">
-                          <p className="text-xs text-muted-foreground mb-1">{formatDate(review.reviewDate)}</p>
-                          <h3 className="font-serif text-lg font-semibold text-foreground group-hover:text-primary transition-colors line-clamp-1">{review.title}</h3>
-                          <p className="text-sm text-muted-foreground/80">por {review.author}</p>
-                          {review.genre && <Badge variant="outline" className="mt-1 text-xs">{review.genre}</Badge>}
-                        </div>
-                        <ChevronRight className="w-5 h-5 text-muted-foreground group-hover:text-primary transition-colors flex-shrink-0" />
-                      </Card>
-                    </Link>
-                  ))}
-                </div>
-              )}
+            <div className="flex items-center gap-5 text-xs uppercase tracking-[.16em]">
+              <button
+                type="button"
+                disabled={!newerYear}
+                onClick={() => newerYear && selectYear(newerYear)}
+                className="archive-step disabled:opacity-25"
+              >
+                <ChevronLeft className="h-4 w-4" /> Mais recente
+              </button>
+              <button
+                type="button"
+                disabled={!olderYear}
+                onClick={() => olderYear && selectYear(olderYear)}
+                className="archive-step disabled:opacity-25"
+              >
+                Mais antigo <ChevronRight className="h-4 w-4" />
+              </button>
             </div>
           </div>
+
+          {isLoading ? (
+            <div className="grid min-h-[420px] place-items-center">
+              <Loader2 className="h-8 w-8 animate-spin text-gold" />
+            </div>
+          ) : reviews.length === 0 ? (
+            <div className="archive-empty">
+              <Calendar className="h-8 w-8" />
+              <h3>Nenhuma publicação neste recorte.</h3>
+              <p>Escolha outro mês ou retorne à visão do ano completo.</p>
+            </div>
+          ) : (
+            <div className="archive-story-grid mt-8">
+              {reviews.map((review, index) => (
+                <Link
+                  key={review.id}
+                  href={`/resenhas/${review.id}`}
+                  className={`archive-story-card ${index === 0 ? "archive-story-lead" : ""}`}
+                >
+                  <div className="archive-story-media">
+                    {review.coverImageUrl ? (
+                      <img
+                        src={review.coverImageUrl}
+                        alt={`Capa de ${review.title}`}
+                        loading="lazy"
+                        onError={(event) => {
+                          event.currentTarget.style.display = "none";
+                          event.currentTarget.nextElementSibling?.classList.remove("hidden");
+                        }}
+                      />
+                    ) : null}
+                    <div className={review.coverImageUrl ? "hidden" : ""}>
+                      <ImageFallback title={review.title} />
+                    </div>
+                    <div className="archive-story-shade" />
+                    <span className="archive-story-number">
+                      {String(index + 1).padStart(2, "0")}
+                    </span>
+                  </div>
+                  <div className="archive-story-copy">
+                    <p className="archive-story-date">{formatDate(review.reviewDate)}</p>
+                    <h3>{review.title}</h3>
+                    <p className="archive-story-excerpt">
+                      {review.excerpt || `Uma leitura registrada no acervo de ${selectedYear}.`}
+                    </p>
+                    <div className="archive-story-footer">
+                      <span>{review.genre || "Literatura"}</span>
+                      <ArrowRight className="h-4 w-4" />
+                    </div>
+                  </div>
+                </Link>
+              ))}
+            </div>
+          )}
         </div>
       </section>
     </div>

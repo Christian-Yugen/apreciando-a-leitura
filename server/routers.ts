@@ -50,6 +50,10 @@ export const appRouter = router({
     genres: publicProcedure.query(async () => {
       return db.getDistinctGenres();
     }),
+
+    stats: publicProcedure.query(async () => {
+      return db.getReviewStats();
+    }),
   }),
 
   books: router({

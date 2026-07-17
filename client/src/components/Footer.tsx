@@ -1,63 +1,52 @@
 import { Link } from "wouter";
-import { BookOpen, Mail, Pen } from "lucide-react";
+import { ArrowUpRight, Mail } from "lucide-react";
 
 export default function Footer() {
   return (
-    <footer className="border-t border-border/40 bg-card/30 mt-auto">
-      <div className="container py-12">
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mb-8">
-          {/* Brand */}
-          <div className="space-y-3">
-            <div className="flex items-center gap-2.5">
-              <div className="flex items-center justify-center w-8 h-8 rounded-lg bg-primary/10 border border-primary/20">
-                <BookOpen className="w-4 h-4 text-primary" />
+    <footer className="mt-auto border-t border-white/10 bg-ink text-white">
+      <div className="container py-16 md:py-20">
+        <div className="grid gap-14 lg:grid-cols-[1.1fr_.9fr_1fr]">
+          <div>
+            <div className="flex items-center gap-4">
+              <div className="brand-mark brand-mark-light"><span>A</span><span>L</span></div>
+              <div>
+                <p className="font-serif text-2xl">Apreciando a Leitura</p>
+                <p className="mt-1 text-[9px] uppercase tracking-[0.3em] text-white/35">por Elaise G. Lima</p>
               </div>
-              <span className="font-serif text-base font-bold text-foreground">Apreciando a Leitura</span>
             </div>
-            <p className="text-sm text-muted-foreground leading-relaxed max-w-xs">
-              Resenhas literárias, análises e serviços de revisão por Elaise G. Lima — escritora de fantasia e ficção cristã.
+            <p className="mt-7 max-w-md text-sm leading-7 text-white/50">
+              Uma revista literária digital construída sobre quinze anos de resenhas,
+              descobertas e encontros com histórias.
             </p>
           </div>
 
-          {/* Navigation */}
-          <div className="space-y-3">
-            <h3 className="text-sm font-semibold text-foreground uppercase tracking-wider">Navegação</h3>
-            <div className="grid grid-cols-2 gap-x-4 gap-y-2">
-              <Link href="/resenhas" className="text-sm text-muted-foreground hover:text-primary transition-colors">Resenhas</Link>
-              <Link href="/acervo-historico" className="text-sm text-muted-foreground hover:text-primary transition-colors">Acervo Histórico</Link>
-              <Link href="/sobre" className="text-sm text-muted-foreground hover:text-primary transition-colors">Sobre a Autora</Link>
-              <Link href="/meus-livros" className="text-sm text-muted-foreground hover:text-primary transition-colors">Meus Livros</Link>
-              <Link href="/servicos" className="text-sm text-muted-foreground hover:text-primary transition-colors">Serviços</Link>
-              <Link href="/contato" className="text-sm text-muted-foreground hover:text-primary transition-colors">Contato</Link>
+          <div>
+            <p className="mb-5 text-[10px] uppercase tracking-[0.28em] text-white/35">Navegação</p>
+            <div className="grid grid-cols-2 gap-x-8 gap-y-3">
+              <Link href="/resenhas" className="footer-link">Resenhas</Link>
+              <Link href="/acervo-historico" className="footer-link">Acervo</Link>
+              <Link href="/sobre" className="footer-link">Sobre a autora</Link>
+              <Link href="/meus-livros" className="footer-link">Livros</Link>
+              <Link href="/servicos" className="footer-link">Serviços</Link>
+              <Link href="/contato" className="footer-link">Contato</Link>
             </div>
           </div>
 
-          {/* Contact */}
-          <div className="space-y-3">
-            <h3 className="text-sm font-semibold text-foreground uppercase tracking-wider">Contato</h3>
-            <a
-              href="mailto:elaiselima@gmail.com"
-              className="flex items-center gap-2 text-sm text-muted-foreground hover:text-primary transition-colors"
-            >
-              <Mail className="w-4 h-4" />
-              elaiselima@gmail.com
+          <div>
+            <p className="mb-5 text-[10px] uppercase tracking-[0.28em] text-white/35">Contato editorial</p>
+            <a href="mailto:elaiselima@gmail.com" className="group inline-flex items-center gap-3 font-serif text-2xl">
+              <Mail className="h-4 w-4 text-gold" />
+              <span className="border-b border-white/15 pb-1 transition-colors group-hover:text-gold">elaiselima@gmail.com</span>
             </a>
-            <div className="flex items-center gap-2 text-sm text-muted-foreground">
-              <Pen className="w-4 h-4" />
-              Serviços de revisão disponíveis
-            </div>
+            <Link href="/servicos" className="mt-8 inline-flex items-center gap-2 text-[10px] uppercase tracking-[0.22em] text-gold">
+              Conheça os serviços <ArrowUpRight className="h-4 w-4" />
+            </Link>
           </div>
         </div>
 
-        <div className="gold-divider mb-6" />
-
-        <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
-          <p className="text-xs text-muted-foreground">
-            &copy; {new Date().getFullYear()} Apreciando a Leitura. Todos os direitos reservados.
-          </p>
-          <p className="text-xs text-muted-foreground">
-            Elaise G. Lima — Escritora &amp; Revisora
-          </p>
+        <div className="mt-16 flex flex-col gap-4 border-t border-white/10 pt-7 text-[10px] uppercase tracking-[0.16em] text-white/30 sm:flex-row sm:items-center sm:justify-between">
+          <p>© {new Date().getFullYear()} Apreciando a Leitura</p>
+          <p>Elaise G. Lima · Escritora e revisora</p>
         </div>
       </div>
     </footer>

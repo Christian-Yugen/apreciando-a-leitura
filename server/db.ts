@@ -144,6 +144,25 @@ export async function getReviewYears() {
   return result.map((r: { year: number }) => r.year);
 }
 
+export async function getReviewStats() {
+  const db = await getDb();
+  if (!db) {
+    return { total: 0, firstPublication: null, lastPublication: null };
+  }
+
+  const [result] = await db.select({
+    total: sql<number>`COUNT(*)`,
+    firstPublication: sql<Date | null>`MIN(${reviews.reviewDate})`,
+    lastPublication: sql<Date | null>`MAX(${reviews.reviewDate})`,
+  }).from(reviews);
+
+  return {
+    total: Number(result?.total ?? 0),
+    firstPublication: result?.firstPublication ?? null,
+    lastPublication: result?.lastPublication ?? null,
+  };
+}
+
 export async function getDistinctGenres() {
   const db = await getDb();
   if (!db) return [];

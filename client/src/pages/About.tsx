@@ -7,7 +7,7 @@ export default function About() {
   return (
     <div className="flex flex-col">
       {/* Hero */}
-      <section className="relative bg-gradient-to-br from-primary via-primary to-[oklch(0.25_0.10_285)] text-primary-foreground py-20 px-4 sm:px-6 lg:px-8">
+      <section className="editorial-internal-hero relative overflow-hidden px-4 py-24 text-white sm:px-6 lg:px-8">
         <div className="absolute inset-0 opacity-10">
           <div className="absolute top-10 right-20 w-72 h-72 rounded-full bg-accent blur-3xl" />
           <div className="absolute bottom-10 left-10 w-96 h-96 rounded-full bg-accent blur-3xl" />
