@@ -1,242 +1,111 @@
 # APRECIANDO A LEITURA
 # Animation Guide
-Versão 1.0
+Versão 2.0 — Movimento Cinematográfico
 
 ---
 
-# 1. Objetivo
+## 1. Princípio
 
-Este documento define as diretrizes para utilização de animações no projeto
-Apreciando a Leitura.
+O movimento deve orientar a atenção e reforçar profundidade.
 
-As animações devem melhorar a experiência do usuário sem comprometer a
-performance ou a legibilidade do conteúdo.
+Nunca deve competir com a leitura.
 
 ---
 
-# 2. Princípios
+## 2. Durações
 
-Toda animação deve.
-
-- possuir um propósito
-- ser discreta
-- ser consistente
-- respeitar o ritmo da leitura
-- nunca competir com o conteúdo
+- microinteração: 120–180 ms;
+- hover e foco: 180–240 ms;
+- abertura de painel: 220–320 ms;
+- transição editorial: 300–500 ms;
+- movimento atmosférico: 12–20 s.
 
 ---
 
-# 3. Quando Animar
+## 3. Curvas
 
-Utilizar animações para.
+Preferir:
 
-- transições entre páginas
-- entrada de componentes
-- abertura de menus
-- abertura de modais
-- carregamento de conteúdo
-- feedback de ações
-
-Evitar animações decorativas.
+- `ease-out` para entrada;
+- `ease-in` para saída;
+- `cubic-bezier(.23,1,.32,1)` para elevação e revelação.
 
 ---
 
-# 4. Quando Não Animar
+## 4. Interações
 
-Evitar animações em.
+Capas e imagens:
 
-- blocos de texto longos
-- leitura contínua
-- títulos principais
-- imagens durante a leitura
-- elementos sem interação
+- escala máxima entre 1.02 e 1.045;
+- deslocamento vertical máximo de 4 px;
+- reforço discreto de borda ou sombra.
 
----
+Botões:
 
-# 5. Transições de Página
+- mudança de contraste;
+- deslocamento máximo de 2 px;
+- resposta imediata.
 
-As mudanças de página devem ser suaves.
+Links:
 
-Nunca bloquear a navegação durante a transição.
-
----
-
-# 6. Entrada de Componentes
-
-Componentes podem aparecer utilizando.
-
-- Fade
-- Slide
-- Scale
-
-Evitar movimentos excessivos.
+- linha dourada progressiva;
+- mudança de cor sem salto de layout.
 
 ---
 
-# 7. Hover
+## 5. Revelação de conteúdo
 
-Utilizar hover apenas em elementos interativos.
+Quando um painel ou resumo abrir:
 
-Exemplos.
-
-- Botões
-- Cards
-- Links
-- Ícones
+- sinalizar no elemento acionado;
+- revelar com fade e pequeno deslocamento;
+- rolar apenas quando necessário;
+- manter o foco lógico do teclado.
 
 ---
 
-# 8. Botões
+## 6. Movimento atmosférico
 
-Os botões podem apresentar.
+Permitido apenas em heróis e fundos decorativos.
 
-- mudança de cor
-- alteração de sombra
-- pequena alteração de escala
+Exemplos:
 
-Evitar animações chamativas.
+- zoom lento;
+- variação suave de luz;
+- grão estático;
+- vinheta.
 
----
-
-# 9. Cards
-
-Cards podem possuir.
-
-- elevação
-- sombra
-- pequeno deslocamento
-
-Nunca alterar significativamente sua posição.
+Nunca animar textos longos durante a leitura.
 
 ---
 
-# 10. Menus
+## 7. Acessibilidade
 
-Menus devem abrir e fechar suavemente.
+Com `prefers-reduced-motion: reduce`:
 
-A navegação deve permanecer imediata.
-
----
-
-# 11. Modais
-
-A abertura deve ser rápida.
-
-O fechamento deve ocorrer imediatamente após a ação do usuário.
+- remover animações não essenciais;
+- reduzir transições a resposta imediata;
+- desativar zoom contínuo;
+- preservar feedback visual sem movimento.
 
 ---
 
-# 12. Loading
+## 8. Performance
 
-Utilizar.
+Animar preferencialmente:
 
-- Skeleton
-- Spinner
-- Barra de progresso
+- `transform`;
+- `opacity`.
 
-Escolher apenas um padrão por contexto.
+Evitar animações frequentes em:
 
----
-
-# 13. Feedback
-
-Toda ação importante deve gerar retorno visual.
-
-Exemplos.
-
-- sucesso
-- erro
-- carregamento
-- confirmação
+- altura;
+- largura;
+- sombras muito grandes;
+- filtros complexos.
 
 ---
 
-# 14. Duração
+## 9. Regra final
 
-As animações devem ser curtas.
-
-Evitar transições longas que atrasem a interação.
-
----
-
-# 15. Consistência
-
-Componentes iguais devem utilizar a mesma animação em todo o sistema.
-
-Nunca criar animações diferentes para o mesmo comportamento.
-
----
-
-# 16. Performance
-
-As animações não devem.
-
-- bloquear a interface
-- reduzir a fluidez
-- causar atrasos na navegação
-
----
-
-# 17. Acessibilidade
-
-Sempre respeitar usuários que preferem movimento reduzido.
-
-Quando essa preferência estiver ativa.
-
-Reduzir ou remover animações não essenciais.
-
----
-
-# 18. Bibliotecas
-
-Toda biblioteca de animação utilizada deve.
-
-- possuir boa manutenção
-- apresentar documentação
-- justificar sua inclusão no projeto
-
-Evitar múltiplas bibliotecas com a mesma finalidade.
-
----
-
-# 19. Revisão
-
-Toda nova animação deve responder.
-
-Possui objetivo?
-
-Melhora a experiência?
-
-Mantém a leitura confortável?
-
-Impacta a performance?
-
-Se qualquer resposta for negativa.
-
-A animação deve ser revista.
-
----
-
-# 20. Checklist
-
-Antes de adicionar uma animação verificar.
-
-✓ Possui objetivo claro
-
-✓ Não interfere na leitura
-
-✓ Mantém boa performance
-
-✓ É consistente com o restante da interface
-
-✓ Funciona em dispositivos móveis
-
-✓ Respeita redução de movimento
-
-✓ Não compromete a acessibilidade
-
----
-
-Versão: 1.0
-
-Status: Aprovado
+Se uma animação não melhora orientação, feedback ou atmosfera, ela não deve existir.

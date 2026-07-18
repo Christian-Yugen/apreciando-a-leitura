@@ -1,237 +1,116 @@
 # APRECIANDO A LEITURA
 # Brand Guide
-Versão 1.0
+Versão 2.0
 
 ---
 
-# 1. Objetivo
+## 1. Essência
 
-Este documento define as diretrizes de utilização da identidade da marca
-Apreciando a Leitura.
+Apreciando a Leitura é uma revista literária digital construída sobre memória, descoberta e permanência.
 
-Seu objetivo é garantir consistência em todos os meios de comunicação.
+A marca deve parecer:
 
----
-
-# 2. Nome da Marca
-
-Nome oficial.
-
-Apreciando a Leitura
-
-Nunca abreviar.
-
-Nunca utilizar traduções.
+- culta sem ser distante;
+- sofisticada sem ser ostensiva;
+- íntima sem ser informal;
+- cinematográfica sem perder legibilidade.
 
 ---
 
-# 3. Logotipo
+## 2. Assinatura
 
-Utilizar sempre a versão oficial.
+Nome principal:
 
-Não alterar.
+**Apreciando a Leitura**
 
-Não redesenhar.
+Assinatura:
 
-Não modificar proporções.
+**por Elaise G. Lima**
 
----
-
-# 4. Área de Proteção
-
-Sempre manter espaço livre ao redor do logotipo.
-
-Nenhum elemento visual deve competir com a marca.
+A assinatura deve sempre permanecer subordinada ao nome principal.
 
 ---
 
-# 5. Tamanho Mínimo
+## 3. Símbolo
 
-O logotipo nunca deve ser reduzido a um tamanho que comprometa sua legibilidade.
+O monograma `A L` deve ser aplicado dentro de moldura fina.
 
----
+Regras:
 
-# 6. Cores Institucionais
-
-As cores oficiais são definidas no
-01_PRODUCT_DESIGN_SYSTEM.md.
-
-Nenhuma nova cor institucional pode ser criada sem atualização daquele documento.
+- marfim para a letra principal;
+- dourado para o detalhe;
+- área de proteção mínima igual à metade da largura do símbolo;
+- nunca aplicar efeitos fortes, relevo ou gradientes no monograma.
 
 ---
 
-# 7. Tipografia
+## 4. Universo visual
 
-As fontes oficiais são definidas no
-01_PRODUCT_DESIGN_SYSTEM.md.
+A marca utiliza:
 
-Não utilizar fontes diferentes em materiais oficiais.
+- preto cinematográfico;
+- marfim aquecido;
+- dourado editorial;
+- luz baixa;
+- fotografia de livros, bibliotecas e ambientes de leitura;
+- composição limpa e silenciosa.
 
----
-
-# 8. Uso da Marca
-
-A marca pode ser utilizada em.
-
-- Website
-- Redes sociais
-- Newsletter
-- Apresentações
-- Materiais institucionais
-
-Sempre respeitando estas diretrizes.
+A atmosfera deve lembrar uma biblioteca iluminada à noite, não uma interface tecnológica genérica.
 
 ---
 
-# 9. Uso Incorreto
+## 5. Tom de voz
 
-Nunca.
+A comunicação deve ser:
 
-- distorcer o logotipo
-- alterar proporções
-- trocar cores
-- aplicar sombras
-- aplicar contornos
-- aplicar efeitos
-- utilizar baixa resolução
+- clara;
+- sensível;
+- segura;
+- contemplativa;
+- editorial.
 
----
-
-# 10. Fotografias
-
-As imagens devem priorizar.
-
-- livros
-- bibliotecas
-- leitura
-- ambientes acolhedores
-- detalhes editoriais
-
-Evitar.
-
-- imagens genéricas de banco
-- excesso de pessoas olhando para a câmera
-- fotografias artificiais
+Evitar linguagem promocional excessiva, clichês e superlativos vazios.
 
 ---
 
-# 11. Ilustrações
+## 6. Aplicação digital
 
-Sempre discretas.
+Em páginas, newsletters e redes sociais:
 
-Devem complementar o conteúdo.
-
-Nunca competir com os livros.
-
----
-
-# 12. Ícones
-
-Utilizar apenas a biblioteca oficial definida no Product Design System.
-
-Não misturar estilos.
+- manter a paleta oficial;
+- preservar contraste;
+- usar dourado com moderação;
+- priorizar conteúdo;
+- manter títulos fortes e textos curtos de apoio.
 
 ---
 
-# 13. Comunicação Institucional
+## 7. Imagens
 
-Toda comunicação da marca deve transmitir.
+Imagens devem reforçar narrativa, autoria e atmosfera.
 
-- credibilidade
-- serenidade
-- elegância
-- organização
-- respeito pelo leitor
+Evitar:
 
-Evitar.
-
-- sensacionalismo
-- excesso de marketing
-- linguagem agressiva
+- bancos de imagem genéricos;
+- excesso de filtros;
+- saturação alta;
+- sobreposição de muitos elementos.
 
 ---
 
-# 14. Redes Sociais
+## 8. Proibições
 
-Toda publicação deve.
+Não utilizar:
 
-- manter identidade visual
-- utilizar linguagem consistente
-- preservar a credibilidade da marca
-
----
-
-# 15. Newsletter
-
-A newsletter faz parte da identidade editorial.
-
-Não deve possuir aparência promocional.
-
-Priorizar conteúdo.
+- branco puro como fundo dominante;
+- roxo como cor institucional principal;
+- dourado em grandes blocos;
+- sombras pesadas em todos os componentes;
+- cantos excessivamente arredondados;
+- estética de dashboard ou SaaS.
 
 ---
 
-# 16. Apresentações
+## 9. Consistência
 
-Slides institucionais devem utilizar.
-
-- tipografia oficial
-- cores oficiais
-- espaçamento consistente
-- poucas informações por slide
-
----
-
-# 17. Documentos
-
-Todos os documentos oficiais devem utilizar.
-
-- identidade visual consistente
-- linguagem formal
-- mesma estrutura de títulos
-
----
-
-# 18. Parcerias
-
-Sempre que a marca aparecer ao lado de outra.
-
-Preservar.
-
-- proporção
-- legibilidade
-- área de proteção
-
-Nenhuma marca deve competir visualmente com outra.
-
----
-
-# 19. Atualização
-
-Qualquer alteração na identidade da marca deve ser registrada neste documento.
-
----
-
-# 20. Checklist
-
-Antes de publicar qualquer material verificar.
-
-✓ Logotipo correto
-
-✓ Cores oficiais
-
-✓ Tipografia oficial
-
-✓ Imagens adequadas
-
-✓ Linguagem consistente
-
-✓ Boa legibilidade
-
-✓ Respeito à identidade da marca
-
----
-
-Versão: 1.0
-
-Status: Aprovado
+Toda mudança na identidade deve ser registrada no Product Design System e no Changelog.

@@ -63,6 +63,31 @@ Correções relacionadas à segurança.
 
 # Histórico
 
+## [0.2.0] - 2026-07-17
+
+### Added
+
+- Fundação visual cinematográfica global.
+- Tokens oficiais de preto, marfim e dourado.
+- Classes reutilizáveis para páginas, superfícies, títulos e seções cinematográficas.
+- Estados globais de foco e suporte a movimento reduzido.
+
+### Changed
+
+- Header convertido para navegação escura, translúcida e persistente.
+- Footer integrado ao fundo cinematográfico.
+- Product Design System atualizado para a versão 2.0.
+- Brand Guide atualizado para a nova identidade.
+- Animation Guide atualizado com tempos, curvas e limites objetivos.
+- Paleta roxa e base clara deixam de ser o padrão institucional.
+
+### Fixed
+
+- Contraste global e consistência entre superfícies escuras.
+- Rolagem e foco visual padronizados.
+
+---
+
 ## [0.1.0] - Em desenvolvimento
 
 ### Added

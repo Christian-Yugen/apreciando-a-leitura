@@ -16,26 +16,19 @@ const navLinks = [
 export default function Header() {
   const [isOpen, setIsOpen] = useState(false);
   const [location] = useLocation();
-  const onHome = location === "/";
 
   return (
-    <header
-      className={
-        onHome
-          ? "absolute inset-x-0 top-0 z-50 w-full border-b border-white/10 bg-black/10 text-white backdrop-blur-md"
-          : "sticky top-0 z-50 w-full border-b border-border/50 bg-background/90 backdrop-blur-xl"
-      }
-    >
-      <div className="container flex h-[82px] items-center justify-between">
-        <Link href="/" className="group flex items-center gap-4" aria-label="Apreciando a Leitura — página inicial">
-          <div className={`brand-mark ${onHome ? "brand-mark-light" : ""}`}>
+    <header className="cinematic-header sticky top-0 z-50 w-full">
+      <div className="container flex h-[74px] items-center justify-between md:h-[82px]">
+        <Link href="/" className="group flex items-center gap-3.5" aria-label="Apreciando a Leitura — página inicial">
+          <div className="brand-mark brand-mark-light" aria-hidden="true">
             <span>A</span><span>L</span>
           </div>
           <div className="leading-none">
-            <span className="block font-serif text-xl font-semibold tracking-tight">
+            <span className="block font-serif text-[1.12rem] font-medium tracking-[-0.02em] text-cinema-ivory md:text-xl">
               Apreciando a Leitura
             </span>
-            <span className={`mt-1.5 block text-[9px] uppercase tracking-[0.34em] ${onHome ? "text-white/45" : "text-muted-foreground"}`}>
+            <span className="mt-1.5 block text-[8px] uppercase tracking-[0.34em] text-cinema-muted">
               por Elaise G. Lima
             </span>
           </div>
@@ -48,7 +41,7 @@ export default function Header() {
               <Link
                 key={link.href}
                 href={link.href}
-                className={`nav-link ${onHome ? "nav-link-light" : ""} ${active ? "nav-link-active" : ""}`}
+                className={`nav-link nav-link-light ${active ? "nav-link-active" : ""}`}
               >
                 {link.label}
               </Link>
@@ -61,29 +54,32 @@ export default function Header() {
             <Button
               variant="ghost"
               size="icon"
-              className={onHome ? "text-white hover:bg-white/10 hover:text-white lg:hidden" : "lg:hidden"}
+              className="text-cinema-ivory hover:bg-white/5 hover:text-gold lg:hidden"
+              aria-label="Abrir menu"
             >
               <MenuIcon className="h-5 w-5" />
-              <span className="sr-only">Abrir menu</span>
             </Button>
           </SheetTrigger>
-          <SheetContent side="right" className="w-[90vw] max-w-[410px] bg-ink p-8 text-white">
-            <div className="brand-mark brand-mark-light mb-12"><span>A</span><span>L</span></div>
-            <p className="mb-7 text-[10px] uppercase tracking-[0.3em] text-white/35">Navegação</p>
+          <SheetContent side="right" className="cinematic-drawer w-[90vw] max-w-[410px] p-8 text-cinema-ivory">
+            <div className="brand-mark brand-mark-light mb-12" aria-hidden="true"><span>A</span><span>L</span></div>
+            <p className="mb-7 text-[10px] uppercase tracking-[0.3em] text-cinema-muted">Navegação</p>
             <nav className="flex flex-col">
-              {navLinks.map((link, index) => (
-                <Link
-                  key={link.href}
-                  href={link.href}
-                  onClick={() => setIsOpen(false)}
-                  className="group flex items-center justify-between border-b border-white/10 py-5 font-serif text-3xl"
-                >
-                  <span className="transition-colors group-hover:text-gold">{link.label}</span>
-                  <span className="text-[10px] tracking-[0.2em] text-white/30">0{index + 1}</span>
-                </Link>
-              ))}
+              {navLinks.map((link, index) => {
+                const active = location === link.href || location.startsWith(`${link.href}/`);
+                return (
+                  <Link
+                    key={link.href}
+                    href={link.href}
+                    onClick={() => setIsOpen(false)}
+                    className={`group flex items-center justify-between border-b border-white/10 py-5 font-serif text-3xl transition-colors ${active ? "text-gold" : "text-cinema-ivory"}`}
+                  >
+                    <span className="transition-colors group-hover:text-gold">{link.label}</span>
+                    <span className="text-[10px] tracking-[0.2em] text-white/30">0{index + 1}</span>
+                  </Link>
+                );
+              })}
             </nav>
-            <p className="mt-12 max-w-xs text-sm leading-7 text-white/45">
+            <p className="mt-12 max-w-xs text-sm leading-7 text-cinema-muted">
               Resenhas, ensaios e memória literária desde 2011.
             </p>
           </SheetContent>

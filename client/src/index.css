@@ -812,3 +812,202 @@ main .rounded-xl, main .rounded-lg { border-radius:0; }
   .related-story-grid { grid-template-columns: 1fr; }
   .related-story-media { aspect-ratio: 16/11; }
 }
+
+/* ========================================================================== 
+   CINEMATIC GLOBAL FOUNDATION — v2.0
+   Dark editorial system inspired by film lighting, not by streaming UI chrome.
+   ========================================================================== */
+:root,
+.dark {
+  --background: #080a0b;
+  --foreground: #f3eee5;
+  --card: #0e1112;
+  --card-foreground: #f3eee5;
+  --popover: #111415;
+  --popover-foreground: #f3eee5;
+  --primary: #c9943c;
+  --primary-foreground: #100d08;
+  --secondary: #171b1c;
+  --secondary-foreground: #eee7dc;
+  --muted: #141819;
+  --muted-foreground: #99958e;
+  --accent: #d6a44b;
+  --accent-foreground: #0c0a06;
+  --border: rgba(238, 222, 194, 0.12);
+  --input: rgba(255, 255, 255, 0.055);
+  --ring: #d6a44b;
+  --sidebar: #0b0e0f;
+  --sidebar-foreground: #f3eee5;
+  --sidebar-primary: #d6a44b;
+  --sidebar-primary-foreground: #0c0a06;
+  --sidebar-accent: #171b1c;
+  --sidebar-accent-foreground: #f3eee5;
+  --sidebar-border: rgba(238, 222, 194, 0.12);
+  --sidebar-ring: #d6a44b;
+
+  --gold: #d6a44b;
+  --gold-soft: #b7863c;
+  --gold-pale: #e5c17b;
+  --ink: #080a0b;
+  --cinema-black: #080a0b;
+  --cinema-panel: #0e1112;
+  --cinema-panel-raised: #121617;
+  --cinema-ivory: #f3eee5;
+  --cinema-muted: #99958e;
+  --cinema-line: rgba(238, 222, 194, 0.12);
+  --cinema-glow: rgba(214, 164, 75, 0.16);
+  --cinema-shadow: 0 28px 90px rgba(0, 0, 0, 0.52);
+}
+
+@layer base {
+  html { color-scheme: dark; background: var(--cinema-black); }
+  body {
+    min-height: 100vh;
+    background:
+      radial-gradient(circle at 82% -8%, rgba(214,164,75,.055), transparent 28rem),
+      linear-gradient(180deg, #090b0c 0%, #080a0b 48%, #070809 100%);
+    color: var(--cinema-ivory);
+  }
+  a, button, input, textarea, select { -webkit-tap-highlight-color: transparent; }
+  :focus-visible { outline: 2px solid var(--gold); outline-offset: 4px; }
+}
+
+.text-cinema-ivory { color: var(--cinema-ivory); }
+.text-cinema-muted { color: var(--cinema-muted); }
+.bg-cinema-panel { background: var(--cinema-panel); }
+.border-cinema { border-color: var(--cinema-line); }
+
+.cinematic-header {
+  border-bottom: 1px solid rgba(238,222,194,.09);
+  background: rgba(6,8,9,.82);
+  color: var(--cinema-ivory);
+  backdrop-filter: blur(18px) saturate(125%);
+  -webkit-backdrop-filter: blur(18px) saturate(125%);
+  box-shadow: 0 12px 36px rgba(0,0,0,.18);
+}
+.cinematic-header::after {
+  content: "";
+  position: absolute;
+  inset-inline: 0;
+  bottom: -1px;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, rgba(214,164,75,.22), transparent);
+  pointer-events: none;
+}
+.cinematic-drawer {
+  border-left: 1px solid rgba(214,164,75,.2) !important;
+  background:
+    radial-gradient(circle at 100% 0%, rgba(214,164,75,.12), transparent 18rem),
+    #090b0c !important;
+}
+.brand-mark-light { color: var(--cinema-ivory); border-color: rgba(214,164,75,.58); }
+.nav-link-light { color: rgba(243,238,229,.68); }
+.nav-link-light:hover,
+.nav-link-light.nav-link-active { color: var(--cinema-ivory); }
+
+.cinematic-footer {
+  position: relative;
+  overflow: hidden;
+  border-top: 1px solid rgba(238,222,194,.10);
+  background:
+    radial-gradient(circle at 14% 0%, rgba(214,164,75,.075), transparent 24rem),
+    linear-gradient(180deg, #0a0d0e 0%, #070809 100%);
+}
+.cinematic-footer::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background: linear-gradient(90deg, transparent, rgba(255,255,255,.015), transparent);
+}
+.footer-link {
+  width: fit-content;
+  color: rgba(243,238,229,.58);
+  font-size: .82rem;
+  transition: color .2s ease, transform .2s ease;
+}
+.footer-link:hover { color: var(--gold); transform: translateX(2px); }
+.cinematic-icon-link {
+  display: grid;
+  width: 2rem;
+  height: 2rem;
+  place-items: center;
+  border: 1px solid rgba(214,164,75,.32);
+  color: var(--gold);
+  transition: border-color .2s ease, background .2s ease, transform .2s ease;
+}
+.cinematic-icon-link:hover {
+  border-color: var(--gold);
+  background: rgba(214,164,75,.08);
+  transform: translateY(-2px);
+}
+
+/* Reusable cinematic surfaces for the page-by-page migration. */
+.cinema-page {
+  min-height: 100vh;
+  background:
+    radial-gradient(circle at 84% 4%, rgba(214,164,75,.055), transparent 30rem),
+    var(--cinema-black);
+  color: var(--cinema-ivory);
+}
+.cinema-surface {
+  border: 1px solid var(--cinema-line);
+  background: linear-gradient(145deg, rgba(255,255,255,.025), rgba(255,255,255,.008));
+  box-shadow: var(--cinema-shadow);
+}
+.cinema-section {
+  position: relative;
+  border-top: 1px solid rgba(238,222,194,.08);
+  background: var(--cinema-black);
+}
+.cinema-section::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background: radial-gradient(circle at 88% 12%, rgba(214,164,75,.045), transparent 26rem);
+}
+.cinema-kicker {
+  color: var(--gold);
+  font-size: .66rem;
+  font-weight: 700;
+  letter-spacing: .28em;
+  text-transform: uppercase;
+}
+.cinema-title {
+  color: var(--cinema-ivory);
+  font-family: var(--font-serif);
+  font-size: clamp(2.8rem, 6vw, 6rem);
+  font-weight: 500;
+  line-height: .94;
+  letter-spacing: -.05em;
+  text-wrap: balance;
+}
+.cinema-copy { color: var(--cinema-muted); line-height: 1.8; }
+.cinema-rule { border-color: var(--cinema-line); }
+
+/* Cognitive comfort: clear hierarchy, controlled contrast, no pure-white glare. */
+.prose,
+.article-prose { color: #d7d0c6; }
+.prose :where(h1,h2,h3,h4,strong),
+.article-prose :where(h1,h2,h3,h4,strong) { color: var(--cinema-ivory); }
+.prose :where(a),
+.article-prose :where(a) { color: var(--gold-pale); text-decoration-color: rgba(214,164,75,.45); }
+
+/* Global scrollbar becomes visually quiet and consistent. */
+::-webkit-scrollbar-track { background: #080a0b; }
+::-webkit-scrollbar-thumb { background: #36312a; border: 2px solid #080a0b; border-radius: 999px; }
+::-webkit-scrollbar-thumb:hover { background: #6e5732; }
+
+@media (max-width: 640px) {
+  .cinematic-header { background: rgba(6,8,9,.92); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    scroll-behavior: auto !important;
+    animation-duration: .01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: .01ms !important;
+  }
+}

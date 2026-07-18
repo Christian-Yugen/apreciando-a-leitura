@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { Link } from "wouter";
 import {
   ArrowRight,
@@ -7,6 +7,7 @@ import {
   ChevronLeft,
   ChevronRight,
   Loader2,
+  X,
 } from "lucide-react";
 import { trpc } from "@/lib/trpc";
 
@@ -25,6 +26,16 @@ const MONTHS = [
   "Dezembro",
 ];
 
+type ArchiveReview = {
+  id: number;
+  title: string;
+  author: string;
+  genre: string | null;
+  reviewDate: Date | string;
+  coverImageUrl: string | null;
+  excerpt: string | null;
+};
+
 function formatDate(date: Date | string) {
   return new Date(date).toLocaleDateString("pt-BR", {
     day: "2-digit",
@@ -33,12 +44,278 @@ function formatDate(date: Date | string) {
   });
 }
 
+function getMonth(date: Date | string) {
+  return new Date(date).getMonth() + 1;
+}
+
 function ImageFallback({ title }: { title: string }) {
   return (
-    <div className="archive-cover-fallback" aria-label={`Sem capa para ${title}`}>
-      <BookOpen className="h-8 w-8" />
-      <span>{title.slice(0, 1)}</span>
+    <div
+      className="archive-cover-fallback"
+      role="img"
+      aria-label={`Sem capa para ${title}`}
+    >
+      <BookOpen className="h-8 w-8" aria-hidden="true" />
+      <span aria-hidden="true">{title.slice(0, 1)}</span>
     </div>
+  );
+}
+
+function AnnualShelf({
+  reviews,
+  activeReviewId,
+  onSelect,
+  onClose,
+}: {
+  reviews: ArchiveReview[];
+  activeReviewId: number | null;
+  onSelect: (reviewId: number) => void;
+  onClose: () => void;
+}) {
+  const railRef = useRef<HTMLDivElement>(null);
+  const activeReview = reviews.find((review) => review.id === activeReviewId);
+
+  useEffect(() => {
+    if (!activeReview) return;
+
+    const previousOverflow = document.body.style.overflow;
+    document.body.style.overflow = "hidden";
+
+    const handleKeyDown = (event: KeyboardEvent) => {
+      if (event.key === "Escape") onClose();
+    };
+
+    window.addEventListener("keydown", handleKeyDown);
+
+    return () => {
+      document.body.style.overflow = previousOverflow;
+      window.removeEventListener("keydown", handleKeyDown);
+    };
+  }, [activeReview, onClose]);
+
+  const scroll = (direction: "left" | "right") => {
+    railRef.current?.scrollBy({
+      left: direction === "left" ? -820 : 820,
+      behavior: "smooth",
+    });
+  };
+
+  return (
+    <section className="relative -mx-4 overflow-hidden bg-[radial-gradient(circle_at_18%_20%,rgba(187,143,66,.13),transparent_28%),linear-gradient(135deg,#0a090c_0%,#131015_52%,#09090b_100%)] px-4 py-8 text-white sm:-mx-6 sm:px-6 md:py-10 lg:-mx-8 lg:px-8">
+      <div className="pointer-events-none absolute inset-0 opacity-[.14] [background-image:linear-gradient(rgba(255,255,255,.035)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,.025)_1px,transparent_1px)] [background-size:72px_72px]" />
+      <div className="relative z-10">
+        <div className="mb-5 flex items-end justify-between gap-4">
+          <div>
+            <p className="eyebrow !text-gold">Linha do tempo anual</p>
+            <h3 className="mt-2 max-w-3xl font-serif text-3xl font-medium tracking-[-.04em] text-white md:text-4xl">
+              Todas as publicações em uma única sequência.
+            </h3>
+          </div>
+
+          <div className="hidden items-center gap-2 sm:flex">
+            <button
+              type="button"
+              onClick={() => scroll("left")}
+              className="grid h-10 w-10 place-items-center border border-white/15 bg-white/[.03] text-white/55 backdrop-blur-sm transition-all hover:-translate-y-0.5 hover:border-gold hover:text-white"
+              aria-label="Voltar na linha do tempo anual"
+            >
+              <ChevronLeft className="h-4 w-4" />
+            </button>
+            <button
+              type="button"
+              onClick={() => scroll("right")}
+              className="grid h-10 w-10 place-items-center border border-white/15 bg-white/[.03] text-white/55 backdrop-blur-sm transition-all hover:-translate-y-0.5 hover:border-gold hover:text-white"
+              aria-label="Avançar na linha do tempo anual"
+            >
+              <ChevronRight className="h-4 w-4" />
+            </button>
+          </div>
+        </div>
+
+        <div
+          ref={railRef}
+          className="flex snap-x snap-mandatory gap-5 overflow-x-auto px-2 pb-10 pt-8 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden md:gap-7"
+        >
+          {reviews.map((review, index) => {
+            const isActive = activeReviewId === review.id;
+            const reviewMonth = getMonth(review.reviewDate);
+            const previousMonth =
+              index > 0 ? getMonth(reviews[index - 1].reviewDate) : null;
+            const startsNewMonth = index === 0 || reviewMonth !== previousMonth;
+
+            return (
+              <article
+                key={review.id}
+                className={`relative w-[150px] flex-none snap-start transition-all duration-500 sm:w-[172px] md:w-[190px] ${
+                  isActive ? "z-30" : "z-10"
+                } ${activeReviewId && !isActive ? "opacity-45 saturate-[.7]" : "opacity-100"}`}
+              >
+                <div className="mb-3 min-h-[38px] border-l border-white/15 pl-3">
+                  {startsNewMonth ? (
+                    <>
+                      <p className="text-[10px] uppercase tracking-[.18em] text-gold">
+                        {MONTHS[reviewMonth - 1]}
+                      </p>
+                      <p className="mt-1 text-xs text-white/45">
+                        {new Date(review.reviewDate).toLocaleDateString(
+                          "pt-BR",
+                          {
+                            day: "2-digit",
+                          },
+                        )}
+                      </p>
+                    </>
+                  ) : (
+                    <p className="pt-5 text-xs text-white/45">
+                      {new Date(review.reviewDate).toLocaleDateString("pt-BR", {
+                        day: "2-digit",
+                      })}
+                    </p>
+                  )}
+                </div>
+
+                <button
+                  type="button"
+                  onClick={() => onSelect(review.id)}
+                  aria-expanded={isActive}
+                  className="group relative block w-full text-left focus-visible:outline-none"
+                >
+                  <div
+                    className={`relative aspect-[2/3] overflow-hidden border bg-card transition-all duration-300 ${
+                      isActive
+                        ? "-translate-y-5 scale-[1.09] border-gold shadow-[0_34px_90px_-18px_rgba(190,143,58,.68)] ring-1 ring-gold/55"
+                        : "border-white/12 group-hover:z-40 group-hover:-translate-y-5 group-hover:scale-[1.1] group-hover:rotate-[-.6deg] group-hover:border-gold/80 group-hover:shadow-[0_36px_80px_-22px_rgba(190,143,58,.62)]"
+                    }`}
+                  >
+                    {review.coverImageUrl ? (
+                      <img
+                        src={review.coverImageUrl}
+                        alt={`Capa de ${review.title}`}
+                        loading="lazy"
+                        className="h-full w-full object-cover transition-transform duration-700 ease-out group-hover:scale-[1.06]"
+                        onError={(event) => {
+                          event.currentTarget.style.display = "none";
+                          event.currentTarget.nextElementSibling?.classList.remove(
+                            "hidden",
+                          );
+                        }}
+                      />
+                    ) : null}
+                    <div
+                      className={
+                        review.coverImageUrl ? "hidden h-full" : "h-full"
+                      }
+                    >
+                      <ImageFallback title={review.title} />
+                    </div>
+
+                    <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-white/0 opacity-0 transition-opacity duration-500 group-hover:opacity-100" />
+                    <span className="absolute bottom-2 right-2 grid h-7 w-7 place-items-center border border-white/30 bg-black/65 text-white backdrop-blur-sm transition-all duration-300 group-hover:border-gold group-hover:bg-gold group-hover:text-black">
+                      <BookOpen className="h-3.5 w-3.5" aria-hidden="true" />
+                    </span>
+                    <span className="pointer-events-none absolute inset-x-3 bottom-3 translate-y-3 text-[9px] uppercase tracking-[.18em] text-white opacity-0 transition-all duration-300 group-hover:translate-y-0 group-hover:opacity-100">
+                      Ver detalhes
+                    </span>
+                  </div>
+
+                  <p className="mt-3 line-clamp-2 font-serif text-base leading-tight text-white md:text-lg">
+                    {review.title}
+                  </p>
+                  <p className="mt-1 line-clamp-1 text-[11px] uppercase tracking-[.12em] text-white/42">
+                    {review.author || "Autoria não informada"}
+                  </p>
+                  {isActive ? (
+                    <span className="mt-3 flex items-center gap-2 text-[10px] uppercase tracking-[.18em] text-gold">
+                      <span className="h-px w-7 bg-gold" />
+                      Selecionado
+                    </span>
+                  ) : null}
+                </button>
+              </article>
+            );
+          })}
+        </div>
+
+        {activeReview ? (
+          <div
+            className="fixed inset-0 z-[120] grid place-items-center overflow-y-auto bg-black/80 px-4 py-6 backdrop-blur-md animate-in fade-in duration-300"
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby="archive-modal-title"
+            onMouseDown={(event) => {
+              if (event.target === event.currentTarget) onClose();
+            }}
+          >
+            <div className="relative w-full max-w-5xl overflow-hidden border border-gold/35 bg-[#111114] shadow-[0_50px_160px_-35px_rgba(0,0,0,.95)] animate-in zoom-in-95 slide-in-from-bottom-5 duration-500">
+              {activeReview.coverImageUrl ? (
+                <div
+                  className="pointer-events-none absolute inset-0 scale-110 bg-cover bg-center opacity-20 blur-2xl"
+                  style={{ backgroundImage: `url(${activeReview.coverImageUrl})` }}
+                  aria-hidden="true"
+                />
+              ) : null}
+              <div className="pointer-events-none absolute inset-0 bg-[linear-gradient(90deg,rgba(8,8,10,.97)_0%,rgba(12,12,15,.92)_45%,rgba(10,10,12,.97)_100%)]" />
+              <div className="pointer-events-none absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-gold to-transparent" />
+
+              <button
+                type="button"
+                onClick={onClose}
+                className="absolute right-4 top-4 z-20 grid h-10 w-10 place-items-center border border-white/15 bg-black/40 text-white/65 backdrop-blur-sm transition-all hover:rotate-90 hover:border-gold hover:text-gold"
+                aria-label="Fechar detalhes da publicação"
+                autoFocus
+              >
+                <X className="h-4 w-4" />
+              </button>
+
+              <div className="relative z-10 grid gap-8 p-6 md:grid-cols-[220px_minmax(0,1fr)] md:gap-10 md:p-10 lg:grid-cols-[260px_minmax(0,1fr)] lg:p-12">
+                <div className="mx-auto w-full max-w-[220px] md:max-w-none">
+                  <div className="aspect-[2/3] overflow-hidden border border-gold/30 bg-black shadow-[0_30px_80px_-24px_rgba(190,143,58,.55)]">
+                    {activeReview.coverImageUrl ? (
+                      <img
+                        src={activeReview.coverImageUrl}
+                        alt={`Capa de ${activeReview.title}`}
+                        className="h-full w-full object-cover"
+                      />
+                    ) : (
+                      <ImageFallback title={activeReview.title} />
+                    )}
+                  </div>
+                </div>
+
+                <div className="min-w-0 self-center">
+                  <p className="text-[10px] uppercase tracking-[.2em] text-gold">
+                    {activeReview.genre || "Literatura"} · {formatDate(activeReview.reviewDate)}
+                  </p>
+                  <h4
+                    id="archive-modal-title"
+                    className="mt-4 max-w-3xl font-serif text-[clamp(2.3rem,5vw,5rem)] font-medium leading-[.94] tracking-[-.05em] text-white"
+                  >
+                    {activeReview.title}
+                  </h4>
+                  <p className="mt-4 text-sm text-white/48">
+                    por {activeReview.author || "Autoria não informada"}
+                  </p>
+                  <p className="mt-6 max-w-2xl text-sm leading-7 text-white/68 md:text-base md:leading-8">
+                    {activeReview.excerpt ||
+                      "Uma leitura preservada no acervo editorial do Apreciando a Leitura."}
+                  </p>
+
+                  <Link
+                    href={`/resenhas/${activeReview.id}`}
+                    className="group/link mt-8 inline-flex items-center gap-4 text-xs uppercase tracking-[.18em] text-gold"
+                  >
+                    <span className="border-b border-gold/60 pb-2 transition-colors group-hover/link:text-white">
+                      Ler resenha completa
+                    </span>
+                    <ArrowRight className="h-4 w-4 transition-transform duration-300 group-hover/link:translate-x-2" />
+                  </Link>
+                </div>
+              </div>
+            </div>
+          </div>
+        ) : null}
+      </div>
+    </section>
   );
 }
 
@@ -49,30 +326,56 @@ export default function Archive() {
 
   const [selectedYear, setSelectedYear] = useState<number | null>(null);
   const [selectedMonth, setSelectedMonth] = useState<number | null>(null);
+  const [activeReviewId, setActiveReviewId] = useState<number | null>(null);
+
+  const sortedYears = useMemo(() => [...years].sort((a, b) => a - b), [years]);
 
   useEffect(() => {
-    if (selectedYear === null && years.length > 0) {
-      setSelectedYear(years[0]);
+    if (selectedYear === null && sortedYears.length > 0) {
+      setSelectedYear(sortedYears[sortedYears.length - 1]);
     }
-  }, [years, selectedYear]);
+  }, [sortedYears, selectedYear]);
 
   const queryInput = useMemo(
     () => ({ year: selectedYear ?? 0, month: selectedMonth ?? undefined }),
     [selectedYear, selectedMonth],
   );
 
-  const { data: reviews = [], isLoading } =
-    trpc.reviews.byYearMonth.useQuery(queryInput, {
+  const { data: reviews = [], isLoading } = trpc.reviews.byYearMonth.useQuery(
+    queryInput,
+    {
       enabled: selectedYear !== null,
-    });
+    },
+  );
 
-  const currentYearIndex = selectedYear ? years.indexOf(selectedYear) : -1;
-  const olderYear = currentYearIndex >= 0 ? years[currentYearIndex + 1] : undefined;
-  const newerYear = currentYearIndex > 0 ? years[currentYearIndex - 1] : undefined;
+  const annualReviews = useMemo(
+    () =>
+      [...(reviews as ArchiveReview[])].sort(
+        (a, b) =>
+          new Date(a.reviewDate).getTime() - new Date(b.reviewDate).getTime(),
+      ),
+    [reviews],
+  );
+
+  const currentYearIndex = selectedYear
+    ? sortedYears.indexOf(selectedYear)
+    : -1;
+  const olderYear =
+    currentYearIndex > 0 ? sortedYears[currentYearIndex - 1] : undefined;
+  const newerYear =
+    currentYearIndex >= 0 && currentYearIndex < sortedYears.length - 1
+      ? sortedYears[currentYearIndex + 1]
+      : undefined;
 
   const selectYear = (year: number) => {
     setSelectedYear(year);
     setSelectedMonth(null);
+    setActiveReviewId(null);
+  };
+
+  const selectMonth = (month: number | null) => {
+    setSelectedMonth(month);
+    setActiveReviewId(null);
   };
 
   return (
@@ -86,7 +389,7 @@ export default function Archive() {
               Quinze anos de memória literária.
             </h1>
           </div>
-          <div className="max-w-sm border-l border-white/15 pl-7 pb-2">
+          <div className="max-w-sm border-l border-white/15 pb-2 pl-7">
             <p className="text-sm leading-7 text-white/60">
               Um acervo vivo de resenhas, primeiras impressões, ensaios e
               encontros com histórias — organizado para ser explorado, não
@@ -103,7 +406,7 @@ export default function Archive() {
               </div>
               <div>
                 <strong className="block font-serif text-3xl font-normal text-gold">
-                  {years.length || "—"}
+                  {sortedYears.length || "—"}
                 </strong>
                 <span className="text-[10px] uppercase tracking-[.18em] text-white/40">
                   anos catalogados
@@ -120,7 +423,7 @@ export default function Archive() {
             {loadingYears ? (
               <Loader2 className="my-6 h-5 w-5 animate-spin" />
             ) : (
-              years.map((year) => (
+              sortedYears.map((year) => (
                 <button
                   key={year}
                   type="button"
@@ -136,12 +439,14 @@ export default function Archive() {
           </div>
         </div>
 
-        <div className="container py-10 md:py-14">
+        <div className="container py-6 md:py-8">
           <div className="archive-month-bar">
             <button
               type="button"
-              className={`archive-month-button ${selectedMonth === null ? "is-active" : ""}`}
-              onClick={() => setSelectedMonth(null)}
+              className={`archive-month-button ${
+                selectedMonth === null ? "is-active" : ""
+              }`}
+              onClick={() => selectMonth(null)}
             >
               Ano completo
             </button>
@@ -153,7 +458,7 @@ export default function Archive() {
                   selectedMonth === index + 1 ? "is-active" : ""
                 }`}
                 onClick={() =>
-                  setSelectedMonth(selectedMonth === index + 1 ? null : index + 1)
+                  selectMonth(selectedMonth === index + 1 ? null : index + 1)
                 }
               >
                 {month.slice(0, 3)}
@@ -161,7 +466,7 @@ export default function Archive() {
             ))}
           </div>
 
-          <div className="mt-12 flex flex-col gap-6 border-b border-border pb-8 md:flex-row md:items-end md:justify-between">
+          <div className="mt-7 flex flex-col gap-4 border-b border-border pb-6 md:flex-row md:items-end md:justify-between">
             <div>
               <p className="eyebrow">
                 {selectedMonth
@@ -169,7 +474,7 @@ export default function Archive() {
                   : `Edição anual · ${selectedYear ?? ""}`}
               </p>
               <h2 className="mt-3 font-serif text-[clamp(3rem,6vw,6rem)] font-medium leading-none tracking-[-.055em]">
-                {reviews.length} histórias encontradas.
+                {annualReviews.length} histórias encontradas.
               </h2>
             </div>
             <div className="flex items-center gap-5 text-xs uppercase tracking-[.16em]">
@@ -196,54 +501,23 @@ export default function Archive() {
             <div className="grid min-h-[420px] place-items-center">
               <Loader2 className="h-8 w-8 animate-spin text-gold" />
             </div>
-          ) : reviews.length === 0 ? (
+          ) : annualReviews.length === 0 ? (
             <div className="archive-empty">
               <Calendar className="h-8 w-8" />
               <h3>Nenhuma publicação neste recorte.</h3>
               <p>Escolha outro mês ou retorne à visão do ano completo.</p>
             </div>
           ) : (
-            <div className="archive-story-grid mt-8">
-              {reviews.map((review, index) => (
-                <Link
-                  key={review.id}
-                  href={`/resenhas/${review.id}`}
-                  className={`archive-story-card ${index === 0 ? "archive-story-lead" : ""}`}
-                >
-                  <div className="archive-story-media">
-                    {review.coverImageUrl ? (
-                      <img
-                        src={review.coverImageUrl}
-                        alt={`Capa de ${review.title}`}
-                        loading="lazy"
-                        onError={(event) => {
-                          event.currentTarget.style.display = "none";
-                          event.currentTarget.nextElementSibling?.classList.remove("hidden");
-                        }}
-                      />
-                    ) : null}
-                    <div className={review.coverImageUrl ? "hidden" : ""}>
-                      <ImageFallback title={review.title} />
-                    </div>
-                    <div className="archive-story-shade" />
-                    <span className="archive-story-number">
-                      {String(index + 1).padStart(2, "0")}
-                    </span>
-                  </div>
-                  <div className="archive-story-copy">
-                    <p className="archive-story-date">{formatDate(review.reviewDate)}</p>
-                    <h3>{review.title}</h3>
-                    <p className="archive-story-excerpt">
-                      {review.excerpt || `Uma leitura registrada no acervo de ${selectedYear}.`}
-                    </p>
-                    <div className="archive-story-footer">
-                      <span>{review.genre || "Literatura"}</span>
-                      <ArrowRight className="h-4 w-4" />
-                    </div>
-                  </div>
-                </Link>
-              ))}
-            </div>
+            <AnnualShelf
+              reviews={annualReviews}
+              activeReviewId={activeReviewId}
+              onSelect={(reviewId) =>
+                setActiveReviewId((current) =>
+                  current === reviewId ? null : reviewId,
+                )
+              }
+              onClose={() => setActiveReviewId(null)}
+            />
           )}
         </div>
       </section>
