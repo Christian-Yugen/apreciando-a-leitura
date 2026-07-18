@@ -10,6 +10,10 @@ import {
   X,
 } from "lucide-react";
 import { trpc } from "@/lib/trpc";
+import {
+  createThemeVariables,
+  useCinematicTheme,
+} from "@/lib/cinematic";
 
 const MONTHS = [
   "Janeiro",
@@ -78,9 +82,6 @@ function AnnualShelf({
   useEffect(() => {
     if (!activeReview) return;
 
-    const previousOverflow = document.body.style.overflow;
-    document.body.style.overflow = "hidden";
-
     const handleKeyDown = (event: KeyboardEvent) => {
       if (event.key === "Escape") onClose();
     };
@@ -88,7 +89,6 @@ function AnnualShelf({
     window.addEventListener("keydown", handleKeyDown);
 
     return () => {
-      document.body.style.overflow = previousOverflow;
       window.removeEventListener("keydown", handleKeyDown);
     };
   }, [activeReview, onClose]);
@@ -101,7 +101,9 @@ function AnnualShelf({
   };
 
   return (
-    <section className="relative -mx-4 overflow-hidden bg-[radial-gradient(circle_at_18%_20%,rgba(187,143,66,.13),transparent_28%),linear-gradient(135deg,#0a090c_0%,#131015_52%,#09090b_100%)] px-4 py-8 text-white sm:-mx-6 sm:px-6 md:py-10 lg:-mx-8 lg:px-8">
+    <section
+      className="archive-annual-shelf relative -mx-4 overflow-hidden px-4 py-8 text-white sm:-mx-6 sm:px-6 md:py-10 lg:-mx-8 lg:px-8"
+    >
       <div className="pointer-events-none absolute inset-0 opacity-[.14] [background-image:linear-gradient(rgba(255,255,255,.035)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,.025)_1px,transparent_1px)] [background-size:72px_72px]" />
       <div className="relative z-10">
         <div className="mb-5 flex items-end justify-between gap-4">
@@ -237,37 +239,32 @@ function AnnualShelf({
         </div>
 
         {activeReview ? (
-          <div
-            className="fixed inset-0 z-[120] grid place-items-center overflow-y-auto bg-black/80 px-4 py-6 backdrop-blur-md animate-in fade-in duration-300"
-            role="dialog"
-            aria-modal="true"
+          <section
+            key={activeReview.id}
+            className="archive-inline-detail"
+            aria-live="polite"
             aria-labelledby="archive-modal-title"
-            onMouseDown={(event) => {
-              if (event.target === event.currentTarget) onClose();
-            }}
           >
-            <div className="relative w-full max-w-5xl overflow-hidden border border-gold/35 bg-[#111114] shadow-[0_50px_160px_-35px_rgba(0,0,0,.95)] animate-in zoom-in-95 slide-in-from-bottom-5 duration-500">
-              {activeReview.coverImageUrl ? (
-                <div
-                  className="pointer-events-none absolute inset-0 scale-110 bg-cover bg-center opacity-20 blur-2xl"
-                  style={{ backgroundImage: `url(${activeReview.coverImageUrl})` }}
-                  aria-hidden="true"
-                />
-              ) : null}
-              <div className="pointer-events-none absolute inset-0 bg-[linear-gradient(90deg,rgba(8,8,10,.97)_0%,rgba(12,12,15,.92)_45%,rgba(10,10,12,.97)_100%)]" />
-              <div className="pointer-events-none absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-gold to-transparent" />
+            {activeReview.coverImageUrl ? (
+              <div
+                className="pointer-events-none absolute inset-0 scale-110 bg-cover bg-center opacity-20 blur-2xl"
+                style={{ backgroundImage: `url(${activeReview.coverImageUrl})` }}
+                aria-hidden="true"
+              />
+            ) : null}
+            <div className="archive-inline-detail-shade pointer-events-none absolute inset-0" />
+            <div className="pointer-events-none absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-gold to-transparent" />
 
-              <button
-                type="button"
-                onClick={onClose}
-                className="absolute right-4 top-4 z-20 grid h-10 w-10 place-items-center border border-white/15 bg-black/40 text-white/65 backdrop-blur-sm transition-all hover:rotate-90 hover:border-gold hover:text-gold"
-                aria-label="Fechar detalhes da publicação"
-                autoFocus
-              >
-                <X className="h-4 w-4" />
-              </button>
+            <button
+              type="button"
+              onClick={onClose}
+              className="absolute right-4 top-4 z-20 grid h-10 w-10 place-items-center border border-white/15 bg-black/40 text-white/65 backdrop-blur-sm transition-all hover:rotate-90 hover:border-gold hover:text-gold"
+              aria-label="Fechar detalhes da publicação"
+            >
+              <X className="h-4 w-4" />
+            </button>
 
-              <div className="relative z-10 grid gap-8 p-6 md:grid-cols-[220px_minmax(0,1fr)] md:gap-10 md:p-10 lg:grid-cols-[260px_minmax(0,1fr)] lg:p-12">
+            <div className="relative z-10 grid gap-8 p-6 md:grid-cols-[220px_minmax(0,1fr)] md:gap-10 md:p-10 lg:grid-cols-[260px_minmax(0,1fr)] lg:p-12">
                 <div className="mx-auto w-full max-w-[220px] md:max-w-none">
                   <div className="aspect-[2/3] overflow-hidden border border-gold/30 bg-black shadow-[0_30px_80px_-24px_rgba(190,143,58,.55)]">
                     {activeReview.coverImageUrl ? (
@@ -310,9 +307,8 @@ function AnnualShelf({
                     <ArrowRight className="h-4 w-4 transition-transform duration-300 group-hover/link:translate-x-2" />
                   </Link>
                 </div>
-              </div>
             </div>
-          </div>
+          </section>
         ) : null}
       </div>
     </section>
@@ -357,6 +353,43 @@ export default function Archive() {
     [reviews],
   );
 
+  const activeReview = useMemo(
+    () =>
+      annualReviews.find((review) => review.id === activeReviewId) ?? null,
+    [annualReviews, activeReviewId],
+  );
+
+  const { theme: cinematicTheme } = useCinematicTheme(
+    activeReview?.coverImageUrl,
+  );
+
+  const cinematicStyle = useMemo(
+    () => ({
+      ...createThemeVariables(cinematicTheme),
+      backgroundImage: "var(--al-cinematic-gradient-background)",
+      transition:
+        "background-image var(--al-cinematic-duration) var(--al-cinematic-easing)",
+    }),
+    [cinematicTheme],
+  );
+
+  useEffect(() => {
+    const footer = document.querySelector<HTMLElement>(".cinematic-footer");
+    if (!footer) return;
+
+    const variables = createThemeVariables(cinematicTheme);
+
+    Object.entries(variables).forEach(([property, value]) => {
+      if (typeof value === "string") footer.style.setProperty(property, value);
+    });
+
+    return () => {
+      Object.keys(variables).forEach((property) => {
+        footer.style.removeProperty(property);
+      });
+    };
+  }, [cinematicTheme]);
+
   const currentYearIndex = selectedYear
     ? sortedYears.indexOf(selectedYear)
     : -1;
@@ -379,7 +412,10 @@ export default function Archive() {
   };
 
   return (
-    <div className="editorial-page flex flex-col">
+    <div
+      className="editorial-page flex flex-col"
+      style={cinematicStyle}
+    >
       <section className="editorial-internal-hero archive-cinema-hero relative overflow-hidden px-4 py-20 text-white sm:px-6 lg:px-8">
         <div className="cinema-grain absolute inset-0" />
         <div className="relative z-10 mx-auto grid max-w-7xl gap-10 lg:grid-cols-[1fr_auto] lg:items-end">
