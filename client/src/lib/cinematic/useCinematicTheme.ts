@@ -8,7 +8,10 @@ import {
 import { DEFAULT_THEME } from "./constants"
 import { extractPalette } from "./colorExtractor"
 import { normalizePalette } from "./paletteNormalizer"
-import type { CinematicTheme } from "./types"
+import type {
+  CinematicTheme,
+  ExtractedPalette
+} from "./types"
 
 export interface UseCinematicThemeResult {
   theme: CinematicTheme
@@ -16,14 +19,62 @@ export interface UseCinematicThemeResult {
   error: Error | null
 }
 
+const REAL_THEME_CACHE_VERSION = "v2:real:"
+
+const FALLBACK_COLORS = [
+  "#8f3f35",
+  "#355f72",
+  "#5e4b78",
+  "#3e6651",
+  "#8a623d",
+  "#6e3f58",
+  "#315e66",
+  "#75612f"
+] as const
+
+/**
+ * Cria uma paleta estável baseada na URL da capa.
+ *
+ * Essa paleta é usada quando o navegador não consegue
+ * acessar os pixels da imagem por restrições de CORS.
+ */
+function createUrlFallbackPalette(
+  imageUrl: string
+): ExtractedPalette {
+  let hash = 0
+
+  for (
+    let index = 0;
+    index < imageUrl.length;
+    index += 1
+  ) {
+    hash =
+      (hash * 31 + imageUrl.charCodeAt(index)) >>> 0
+  }
+
+  const primary =
+    FALLBACK_COLORS[
+      hash % FALLBACK_COLORS.length
+    ]
+
+  const secondary =
+    FALLBACK_COLORS[
+      Math.floor(
+        hash / FALLBACK_COLORS.length
+      ) % FALLBACK_COLORS.length
+    ]
+
+  return {
+    dominant: primary,
+    vibrant: primary,
+    muted: secondary,
+    darkMuted: secondary
+  }
+}
+
 /**
  * Gera automaticamente uma atmosfera cinematográfica
  * com base na imagem informada.
- *
- * O tema padrão é retornado quando:
- * - não existe imagem;
- * - a extração falha;
- * - o processamento ainda não terminou.
  */
 export function useCinematicTheme(
   imageUrl?: string | null
@@ -52,12 +103,9 @@ export function useCinematicTheme(
       }
     }
 
-    // A partir daqui sabemos que existe uma URL válida.
-    // Criamos uma constante tipada como string para evitar
-    // problemas de narrowing dentro da função assíncrona.
-    const image: string = normalizedUrl
-
-    const cachedTheme = getThemeFromCache(image)
+    const image = normalizedUrl
+    const cacheKey = `${REAL_THEME_CACHE_VERSION}${image}`
+    const cachedTheme = getThemeFromCache(cacheKey)
 
     if (cachedTheme) {
       setTheme(cachedTheme)
@@ -85,16 +133,23 @@ export function useCinematicTheme(
           normalizePalette(extractedPalette)
 
         const generatedTheme =
-          generateCinematicTheme(normalizedPalette)
+          generateCinematicTheme(
+            normalizedPalette
+          )
 
         saveThemeToCache(
-          image,
+          cacheKey,
           generatedTheme
         )
 
-        if (!isCancelled) {
-          setTheme(generatedTheme)
+        if (import.meta.env.DEV) {
+          console.info(
+            "[AL Cinematic Engine] Paleta real extraída via proxy:",
+            image
+          )
         }
+
+        setTheme(generatedTheme)
       } catch (unknownError) {
         if (isCancelled) {
           return
@@ -107,8 +162,39 @@ export function useCinematicTheme(
                 "Não foi possível gerar a atmosfera cinematográfica."
               )
 
-        setError(processingError)
-        setTheme(DEFAULT_THEME)
+        try {
+          const fallbackPalette =
+            normalizePalette(
+              createUrlFallbackPalette(image)
+            )
+
+          const fallbackTheme =
+            generateCinematicTheme(
+              fallbackPalette
+            )
+
+          if (import.meta.env.DEV) {
+            console.warn(
+              "[AL Cinematic Engine] Proxy falhou; fallback por URL aplicado:",
+              image,
+              processingError
+            )
+          }
+
+          setError(processingError)
+          setTheme(fallbackTheme)
+        } catch (fallbackError) {
+          if (import.meta.env.DEV) {
+            console.error(
+              "[AL Cinematic Engine] Proxy e fallback falharam; tema padrão aplicado:",
+              image,
+              fallbackError
+            )
+          }
+
+          setError(processingError)
+          setTheme(DEFAULT_THEME)
+        }
       } finally {
         if (!isCancelled) {
           setIsLoading(false)

@@ -448,9 +448,127 @@ main .rounded-xl, main .rounded-lg { border-radius:0; }
   min-height: 52vh;
   display: grid;
   align-items: end;
+  isolation: isolate;
+  background: var(--al-cinematic-gradient-background);
+  border-bottom: 1px solid color-mix(in srgb, var(--al-cinematic-primary) 48%, transparent);
+  box-shadow:
+    inset 0 -90px 120px -90px var(--al-cinematic-shadow),
+    0 24px 90px -58px var(--al-cinematic-glow);
+  transition:
+    background var(--al-cinematic-duration) var(--al-cinematic-easing),
+    border-color var(--al-cinematic-duration) var(--al-cinematic-easing),
+    box-shadow var(--al-cinematic-duration) var(--al-cinematic-easing),
+    filter var(--al-cinematic-duration) var(--al-cinematic-easing);
+}
+
+.editorial-page:has(.archive-cinema-hero) {
+  background: var(--al-cinematic-gradient-background);
+  background-position: center;
+  background-size: cover;
+  transition:
+    background var(--al-cinematic-duration) var(--al-cinematic-easing),
+    box-shadow var(--al-cinematic-duration) var(--al-cinematic-easing),
+    filter var(--al-cinematic-duration) var(--al-cinematic-easing);
+}
+
+.archive-cinema-hero::before,
+.archive-cinema-hero::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  transition:
+    background var(--al-cinematic-duration) var(--al-cinematic-easing),
+    box-shadow var(--al-cinematic-duration) var(--al-cinematic-easing),
+    filter var(--al-cinematic-duration) var(--al-cinematic-easing),
+    opacity var(--al-cinematic-duration) var(--al-cinematic-easing);
+}
+
+.archive-cinema-hero::before {
+  z-index: -2;
   background:
-    radial-gradient(circle at 82% 18%, rgba(180, 128, 64, .16), transparent 27%),
-    linear-gradient(125deg, #08070a 0%, #181019 58%, #09070a 100%);
+    var(--al-cinematic-gradient-spotlight),
+    radial-gradient(circle at 12% 72%, color-mix(in srgb, var(--al-cinematic-secondary) 58%, transparent) 0%, transparent 38%),
+    var(--al-cinematic-gradient-background);
+  box-shadow: inset 0 0 150px var(--al-cinematic-glow);
+  filter: saturate(1.32) contrast(1.06);
+  opacity: .98;
+}
+
+.archive-cinema-hero::after {
+  z-index: -1;
+  background:
+    linear-gradient(90deg, rgba(5, 6, 7, .35) 0%, rgba(5, 6, 7, .08) 48%, rgba(5, 6, 7, .28) 100%),
+    linear-gradient(180deg, rgba(5, 6, 7, .08) 0%, rgba(5, 6, 7, .18) 58%, rgba(5, 6, 7, .62) 100%);
+  opacity: .82;
+}
+
+.archive-experience {
+  background:
+    linear-gradient(180deg, rgba(5, 5, 6, .58) 0%, rgba(5, 5, 6, .7) 48%, rgba(5, 5, 6, .78) 100%);
+  transition:
+    background var(--al-cinematic-duration) var(--al-cinematic-easing),
+    border-color var(--al-cinematic-duration) var(--al-cinematic-easing),
+    box-shadow var(--al-cinematic-duration) var(--al-cinematic-easing);
+}
+
+.archive-annual-shelf {
+  background:
+    var(--al-cinematic-gradient-spotlight),
+    linear-gradient(180deg, rgba(5, 5, 6, .38) 0%, rgba(5, 5, 6, .62) 100%);
+  border-block: 1px solid color-mix(in srgb, var(--al-cinematic-primary) 34%, transparent);
+  box-shadow:
+    inset 0 50px 110px -90px var(--al-cinematic-glow),
+    inset 0 -70px 120px -100px var(--al-cinematic-secondary);
+  transition:
+    background var(--al-cinematic-duration) var(--al-cinematic-easing),
+    border-color var(--al-cinematic-duration) var(--al-cinematic-easing),
+    box-shadow var(--al-cinematic-duration) var(--al-cinematic-easing),
+    filter var(--al-cinematic-duration) var(--al-cinematic-easing);
+}
+
+.archive-inline-detail {
+  position: relative;
+  width: 100%;
+  overflow: hidden;
+  border-color: color-mix(in srgb, var(--al-cinematic-primary) 48%, transparent);
+  border-style: solid;
+  border-width: 1px;
+  background:
+    linear-gradient(110deg, rgba(8, 8, 10, .86), rgba(11, 11, 14, .70));
+  box-shadow:
+    0 30px 90px var(--al-cinematic-shadow),
+    0 0 60px var(--al-cinematic-glow);
+  backdrop-filter: blur(2px);
+  -webkit-backdrop-filter: blur(2px);
+  animation: archive-detail-enter var(--al-cinematic-duration) var(--al-cinematic-easing);
+  transition:
+    background var(--al-cinematic-duration) var(--al-cinematic-easing),
+    border-color var(--al-cinematic-duration) var(--al-cinematic-easing),
+    box-shadow var(--al-cinematic-duration) var(--al-cinematic-easing);
+}
+
+.archive-inline-detail-shade {
+  background:
+    linear-gradient(90deg, rgba(8, 8, 10, .72) 0%, rgba(12, 12, 15, .48) 45%, rgba(10, 10, 12, .64) 100%);
+}
+
+@keyframes archive-detail-enter {
+  from {
+    opacity: 0;
+    transform: translateY(18px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@media (min-width: 769px) {
+  .editorial-page:has(.archive-cinema-hero) {
+    background-attachment: fixed;
+  }
 }
 
 .archive-year-rail {
@@ -912,6 +1030,19 @@ main .rounded-xl, main .rounded-lg { border-radius:0; }
   background:
     radial-gradient(circle at 14% 0%, rgba(214,164,75,.075), transparent 24rem),
     linear-gradient(180deg, #0a0d0e 0%, #070809 100%);
+}
+
+.cinematic-footer[style*="--al-cinematic-"] {
+  border-top-color: color-mix(in srgb, var(--al-cinematic-primary) 24%, rgba(238,222,194,.10));
+  background:
+    linear-gradient(180deg, rgba(5, 6, 7, .72) 0%, rgba(5, 6, 7, .9) 58%, #070809 100%),
+    var(--al-cinematic-gradient-spotlight),
+    var(--al-cinematic-gradient-background);
+  box-shadow: inset 0 44px 100px -82px var(--al-cinematic-glow);
+  transition:
+    background var(--al-cinematic-duration) var(--al-cinematic-easing),
+    border-color var(--al-cinematic-duration) var(--al-cinematic-easing),
+    box-shadow var(--al-cinematic-duration) var(--al-cinematic-easing);
 }
 .cinematic-footer::before {
   content: "";

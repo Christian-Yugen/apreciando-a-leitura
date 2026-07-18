@@ -18,23 +18,38 @@ export function generateCinematicTheme(
 ): CinematicTheme {
   const deepBackground = darken(
     palette.background,
-    0.32
+    0.18
   )
 
   const middleBackground = mixColors(
     palette.background,
     palette.primary,
-    0.12
+    0.34
   )
 
-  const subtleGlow = hexToRgba(
+  const primaryAtmosphere = hexToRgba(
     palette.primary,
-    0.18
+    0.42
   )
 
-  const secondaryGlow = hexToRgba(
+  const secondaryAtmosphere = hexToRgba(
     palette.secondary,
-    0.1
+    0.28
+  )
+
+  const accentAtmosphere = hexToRgba(
+    palette.accent,
+    0.14
+  )
+
+  const spotlightGlow = hexToRgba(
+    palette.primary,
+    0.34
+  )
+
+  const spotlightSecondary = hexToRgba(
+    palette.secondary,
+    0.18
   )
 
   return {
@@ -42,19 +57,17 @@ export function generateCinematicTheme(
 
     gradients: {
       background: [
-        "linear-gradient(",
-        "180deg,",
-        `${deepBackground} 0%,`,
-        `${middleBackground} 48%,`,
-        `${palette.background} 100%`,
-        ")"
-      ].join(" "),
+        `radial-gradient(circle at 16% 18%, ${primaryAtmosphere} 0%, transparent 34%)`,
+        `radial-gradient(circle at 84% 12%, ${secondaryAtmosphere} 0%, transparent 30%)`,
+        `radial-gradient(circle at 52% 88%, ${accentAtmosphere} 0%, transparent 38%)`,
+        `linear-gradient(135deg, ${deepBackground} 0%, ${middleBackground} 48%, ${palette.background} 100%)`
+      ].join(", "),
 
       spotlight: [
         "radial-gradient(",
-        "ellipse at 50% 32%,",
-        `${subtleGlow} 0%,`,
-        `${secondaryGlow} 32%,`,
+        "ellipse at 50% 34%,",
+        `${spotlightGlow} 0%,`,
+        `${spotlightSecondary} 34%,`,
         "transparent 72%",
         ")"
       ].join(" ")
