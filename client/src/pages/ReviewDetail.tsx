@@ -196,7 +196,7 @@ export default function ReviewDetail() {
               )}
             </div>
 
-            <div>
+            <div className="article-hero-copy">
               <p className="eyebrow !text-gold">{review.genre || "Literatura"}</p>
               <h1 className="mt-5 max-w-5xl font-serif text-[clamp(3.6rem,7vw,8rem)] font-medium leading-[.84] tracking-[-.065em]">
                 {review.title}
@@ -224,36 +224,43 @@ export default function ReviewDetail() {
         </div>
       </header>
 
+      <section
+        className="article-editorial-strip"
+        aria-label="Informações editoriais da resenha"
+      >
+        <div className="container article-editorial-strip-inner">
+          <div className="article-editorial-signature">
+            <p className="eyebrow">Crítica & memória</p>
+            <p className="font-serif text-2xl leading-tight">
+              Apreciando a Leitura
+            </p>
+          </div>
+
+          <dl className="article-editorial-metadata">
+            <div className="article-editorial-meta-item">
+              <dt>Publicado</dt>
+              <dd>{formatDate(review.reviewDate)}</dd>
+            </div>
+            <div className="article-editorial-meta-item">
+              <dt>Tempo</dt>
+              <dd>{readingTime} min de leitura</dd>
+            </div>
+            {review.genre && (
+              <div className="article-editorial-meta-item">
+                <dt>Categoria</dt>
+                <dd>{review.genre}</dd>
+              </div>
+            )}
+            <div className="article-editorial-meta-item">
+              <dt>Progresso</dt>
+              <dd>{Math.round(progress)}% da leitura</dd>
+            </div>
+          </dl>
+        </div>
+      </section>
+
       <section className="article-reading-stage">
         <div className="container article-magazine-grid">
-          <aside className="article-left-rail">
-            <div className="article-rail-sticky">
-              <p className="eyebrow">Crítica & memória</p>
-              <p className="mt-4 font-serif text-2xl leading-tight">
-                Apreciando a Leitura
-              </p>
-              <div className="mt-8 h-px bg-border" />
-              <dl className="mt-8 space-y-6 text-xs">
-                <div>
-                  <dt className="uppercase tracking-[.15em] text-muted-foreground">
-                    Publicado
-                  </dt>
-                  <dd className="mt-2 font-serif text-base">
-                    {formatDate(review.reviewDate)}
-                  </dd>
-                </div>
-                <div>
-                  <dt className="uppercase tracking-[.15em] text-muted-foreground">
-                    Tempo
-                  </dt>
-                  <dd className="mt-2 font-serif text-base">
-                    {readingTime} minutos
-                  </dd>
-                </div>
-              </dl>
-            </div>
-          </aside>
-
           <main className="article-main-column">
             {review.excerpt && (
               <div className="article-deck">
@@ -281,20 +288,6 @@ export default function ReviewDetail() {
             )}
           </main>
 
-          <aside className="article-right-rail">
-            <div className="article-rail-sticky">
-              <span className="article-reading-index">{Math.round(progress)}%</span>
-              <p className="mt-2 text-[10px] uppercase tracking-[.17em] text-muted-foreground">
-                da leitura
-              </p>
-              <div className="mt-8 h-32 w-px bg-border">
-                <div
-                  className="w-px bg-gold transition-[height]"
-                  style={{ height: `${progress}%` }}
-                />
-              </div>
-            </div>
-          </aside>
         </div>
       </section>
 
