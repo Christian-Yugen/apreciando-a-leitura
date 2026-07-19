@@ -14,6 +14,30 @@ import {
   createThemeVariables,
   useCinematicTheme,
 } from "@/lib/cinematic";
+import type { CinematicTheme } from "@/lib/cinematic";
+
+const NEUTRAL_ARCHIVE_THEME: CinematicTheme = {
+  palette: {
+    primary: "#142126",
+    secondary: "#0A1013",
+    accent: "#1A2528",
+    background: "#07090A",
+    overlay: "rgba(5,7,8,.82)",
+    glow: "rgba(20,33,38,.12)",
+    shadow: "rgba(0,0,0,.78)",
+    text: "#F4F1E8",
+  },
+  gradients: {
+    background:
+      "radial-gradient(ellipse 80% 65% at 25% 15%, rgba(20,31,34,.16), transparent 70%), radial-gradient(ellipse 75% 60% at 85% 70%, rgba(12,16,18,.12), transparent 72%), linear-gradient(180deg,#080A0B,#050607)",
+    spotlight:
+      "radial-gradient(ellipse 70% 60% at center, rgba(20,31,34,.10), transparent 72%)",
+  },
+  motion: {
+    duration: 450,
+    easing: "cubic-bezier(.22,.61,.36,1)",
+  },
+};
 
 const MONTHS = [
   "Janeiro",
@@ -29,6 +53,11 @@ const MONTHS = [
   "Novembro",
   "Dezembro",
 ];
+
+const ARCHIVE_YEARS = Array.from(
+  { length: 2026 - 2011 + 1 },
+  (_, index) => 2011 + index,
+);
 
 type ArchiveReview = {
   id: number;
@@ -118,7 +147,7 @@ function AnnualShelf({
             <button
               type="button"
               onClick={() => scroll("left")}
-              className="grid h-10 w-10 place-items-center border border-white/15 bg-white/[.03] text-white/55 backdrop-blur-sm transition-all hover:-translate-y-0.5 hover:border-gold hover:text-white"
+              className="grid h-10 w-10 place-items-center border border-gold/45 bg-gold/[.04] text-gold shadow-[0_0_12px_color-mix(in_srgb,var(--gold)_12%,transparent)] backdrop-blur-sm transition-all hover:-translate-y-0.5 hover:scale-105 hover:border-gold hover:bg-gold/10 hover:text-gold hover:shadow-[0_0_20px_color-mix(in_srgb,var(--gold)_32%,transparent)]"
               aria-label="Voltar na linha do tempo anual"
             >
               <ChevronLeft className="h-4 w-4" />
@@ -126,7 +155,7 @@ function AnnualShelf({
             <button
               type="button"
               onClick={() => scroll("right")}
-              className="grid h-10 w-10 place-items-center border border-white/15 bg-white/[.03] text-white/55 backdrop-blur-sm transition-all hover:-translate-y-0.5 hover:border-gold hover:text-white"
+              className="grid h-10 w-10 place-items-center border border-gold/45 bg-gold/[.04] text-gold shadow-[0_0_12px_color-mix(in_srgb,var(--gold)_12%,transparent)] backdrop-blur-sm transition-all hover:-translate-y-0.5 hover:scale-105 hover:border-gold hover:bg-gold/10 hover:text-gold hover:shadow-[0_0_20px_color-mix(in_srgb,var(--gold)_32%,transparent)]"
               aria-label="Avançar na linha do tempo anual"
             >
               <ChevronRight className="h-4 w-4" />
@@ -316,15 +345,14 @@ function AnnualShelf({
 }
 
 export default function Archive() {
-  const { data: years = [], isLoading: loadingYears } =
-    trpc.reviews.years.useQuery();
+  const { isLoading: loadingYears } = trpc.reviews.years.useQuery();
   const { data: stats } = trpc.reviews.stats.useQuery();
 
   const [selectedYear, setSelectedYear] = useState<number | null>(null);
   const [selectedMonth, setSelectedMonth] = useState<number | null>(null);
   const [activeReviewId, setActiveReviewId] = useState<number | null>(null);
 
-  const sortedYears = useMemo(() => [...years].sort((a, b) => a - b), [years]);
+  const sortedYears = ARCHIVE_YEARS;
 
   useEffect(() => {
     if (selectedYear === null && sortedYears.length > 0) {
@@ -363,21 +391,25 @@ export default function Archive() {
     activeReview?.coverImageUrl,
   );
 
+  const archiveTheme = activeReview
+    ? cinematicTheme
+    : NEUTRAL_ARCHIVE_THEME;
+
   const cinematicStyle = useMemo(
     () => ({
-      ...createThemeVariables(cinematicTheme),
+      ...createThemeVariables(archiveTheme),
       backgroundImage: "var(--al-cinematic-gradient-background)",
       transition:
         "background-image var(--al-cinematic-duration) var(--al-cinematic-easing)",
     }),
-    [cinematicTheme],
+    [archiveTheme],
   );
 
   useEffect(() => {
     const footer = document.querySelector<HTMLElement>(".cinematic-footer");
     if (!footer) return;
 
-    const variables = createThemeVariables(cinematicTheme);
+    const variables = createThemeVariables(archiveTheme);
 
     Object.entries(variables).forEach(([property, value]) => {
       if (typeof value === "string") footer.style.setProperty(property, value);
@@ -388,7 +420,7 @@ export default function Archive() {
         footer.style.removeProperty(property);
       });
     };
-  }, [cinematicTheme]);
+  }, [archiveTheme]);
 
   const currentYearIndex = selectedYear
     ? sortedYears.indexOf(selectedYear)
@@ -516,19 +548,19 @@ export default function Archive() {
             <div className="flex items-center gap-5 text-xs uppercase tracking-[.16em]">
               <button
                 type="button"
-                disabled={!newerYear}
-                onClick={() => newerYear && selectYear(newerYear)}
-                className="archive-step disabled:opacity-25"
-              >
-                <ChevronLeft className="h-4 w-4" /> Mais recente
-              </button>
-              <button
-                type="button"
                 disabled={!olderYear}
                 onClick={() => olderYear && selectYear(olderYear)}
                 className="archive-step disabled:opacity-25"
               >
-                Mais antigo <ChevronRight className="h-4 w-4" />
+                <ChevronLeft className="h-4 w-4" /> Mais antigo
+              </button>
+              <button
+                type="button"
+                disabled={!newerYear}
+                onClick={() => newerYear && selectYear(newerYear)}
+                className="archive-step disabled:opacity-25"
+              >
+                Mais recente <ChevronRight className="h-4 w-4" />
               </button>
             </div>
           </div>
