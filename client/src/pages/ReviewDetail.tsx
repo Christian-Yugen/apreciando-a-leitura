@@ -13,7 +13,35 @@ import {
   Tag,
 } from "lucide-react";
 import { trpc } from "@/lib/trpc";
+import {
+  createThemeVariables,
+  useCinematicTheme,
+} from "@/lib/cinematic";
+import type { CinematicTheme } from "@/lib/cinematic";
 import { Streamdown } from "streamdown";
+
+const NEUTRAL_REVIEW_THEME: CinematicTheme = {
+  palette: {
+    primary: "#142126",
+    secondary: "#0A1013",
+    accent: "#1A2528",
+    background: "#07090A",
+    overlay: "rgba(5,7,8,.82)",
+    glow: "rgba(20,33,38,.12)",
+    shadow: "rgba(0,0,0,.78)",
+    text: "#F4F1E8",
+  },
+  gradients: {
+    background:
+      "radial-gradient(ellipse 80% 65% at 25% 15%, rgba(20,31,34,.16), transparent 70%), radial-gradient(ellipse 75% 60% at 85% 70%, rgba(12,16,18,.12), transparent 72%), linear-gradient(180deg,#080A0B,#050607)",
+    spotlight:
+      "radial-gradient(ellipse 70% 60% at center, rgba(20,31,34,.10), transparent 72%)",
+  },
+  motion: {
+    duration: 450,
+    easing: "cubic-bezier(.22,.61,.36,1)",
+  },
+};
 
 function formatDate(date: Date | string) {
   return new Date(date).toLocaleDateString("pt-BR", {
@@ -30,10 +58,33 @@ function estimateReadingTime(content: string) {
 
 function removeLeadingCover(content: string, cover?: string | null) {
   if (!cover) return content;
-  const escaped = cover.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
-  return content
-    .replace(new RegExp(`^\\s*!\\[[^\\]]*\\]\\(${escaped}\\)\\s*`, "i"), "")
-    .trim();
+
+  const normalizeImageUrl = (value: string) => {
+    const decoded = value.replace(/&amp;/gi, "&").trim();
+
+    try {
+      const url = new URL(decoded);
+      url.hash = "";
+      return url.toString();
+    } catch {
+      return decoded;
+    }
+  };
+
+  const normalizedCover = normalizeImageUrl(cover);
+  const leadingMarkdownImage = content.match(
+    /^\s*!\[[^\]]*\]\(\s*(?:<([^>]+)>|([^\s)]+))(?:\s+["'][^"']*["'])?\s*\)/i,
+  );
+  const leadingHtmlImage = content.match(
+    /^\s*<img\b[^>]*\bsrc\s*=\s*(?:["']([^"']+)["']|([^\s>]+))[^>]*\/?>/i,
+  );
+  const leadingImage = leadingMarkdownImage ?? leadingHtmlImage;
+  const leadingImageUrl = leadingImage?.[1] ?? leadingImage?.[2];
+
+  if (!leadingImage || !leadingImageUrl) return content;
+  if (normalizeImageUrl(leadingImageUrl) !== normalizedCover) return content;
+
+  return content.slice(leadingImage[0].length).trimStart();
 }
 
 export default function ReviewDetail() {
@@ -43,6 +94,16 @@ export default function ReviewDetail() {
   });
   const { data: recent = [] } = trpc.reviews.list.useQuery({ limit: 8 });
   const [progress, setProgress] = useState(0);
+  const { theme: cinematicTheme } = useCinematicTheme(
+    review?.coverImageUrl,
+  );
+  const reviewTheme = review?.coverImageUrl
+    ? cinematicTheme
+    : NEUTRAL_REVIEW_THEME;
+  const cinematicStyle = useMemo(
+    () => createThemeVariables(reviewTheme),
+    [reviewTheme],
+  );
 
   useEffect(() => {
     const updateProgress = () => {
@@ -53,6 +114,23 @@ export default function ReviewDetail() {
     updateProgress();
     return () => removeEventListener("scroll", updateProgress);
   }, []);
+
+  useEffect(() => {
+    const footer = document.querySelector<HTMLElement>(".cinematic-footer");
+    if (!footer) return;
+
+    const variables = createThemeVariables(reviewTheme);
+
+    Object.entries(variables).forEach(([property, value]) => {
+      if (typeof value === "string") footer.style.setProperty(property, value);
+    });
+
+    return () => {
+      Object.keys(variables).forEach((property) => {
+        footer.style.removeProperty(property);
+      });
+    };
+  }, [reviewTheme]);
 
   const related = useMemo(
     () => recent.filter((item) => item.id !== review?.id).slice(0, 3),
@@ -82,20 +160,16 @@ export default function ReviewDetail() {
   const cleanContent = removeLeadingCover(review.content, review.coverImageUrl);
 
   return (
-    <article className="editorial-article">
+    <article
+      className="editorial-article review-detail-page"
+      style={cinematicStyle}
+    >
       <div
         className="fixed left-0 top-0 z-[100] h-[2px] bg-gold transition-[width]"
         style={{ width: `${progress}%` }}
       />
 
       <header className="article-hero relative overflow-hidden bg-ink text-white">
-        {review.coverImageUrl && (
-          <img
-            src={review.coverImageUrl}
-            alt=""
-            className="absolute inset-0 h-full w-full scale-110 object-cover opacity-25 blur-[3px]"
-          />
-        )}
         <div className="cinema-hero-vignette absolute inset-0" />
         <div className="cinema-grain absolute inset-0" />
 
