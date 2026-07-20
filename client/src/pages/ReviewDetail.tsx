@@ -59,30 +59,51 @@ function estimateReadingTime(content: string) {
 function removeLeadingCover(content: string, cover?: string | null) {
   if (!cover) return content;
 
-  const normalizeImageUrl = (value: string) => {
-    const decoded = value.replace(/&amp;/gi, "&").trim();
+  const decodeUrl = (value: string) =>
+    value
+      .replace(/&amp;|&#0*38;|&#x0*26;/gi, "&")
+      .replace(/&quot;|&#0*34;|&#x0*22;/gi, '"')
+      .trim();
+
+  const normalizeImageUrl = (value: string, base?: string) => {
+    const decoded = decodeUrl(value);
 
     try {
-      const url = new URL(decoded);
+      const url = new URL(decoded, base);
+      url.search = "";
       url.hash = "";
-      return url.toString();
+      url.hostname = url.hostname.toLowerCase().replace(/^www\./, "");
+
+      try {
+        url.pathname = decodeURIComponent(url.pathname);
+      } catch {
+        // Mantém o caminho original quando houver escape inválido no conteúdo.
+      }
+
+      if (/(?:blogspot|blogger|googleusercontent)\./i.test(url.hostname)) {
+        url.pathname = url.pathname.replace(/\/s\d+(?:-[^/]+)?\//i, "/");
+      }
+
+      url.pathname = url.pathname.replace(/\/$/, "");
+
+      return `${url.hostname}${url.port ? `:${url.port}` : ""}${url.pathname}`;
     } catch {
-      return decoded;
+      return decoded.replace(/[?#].*$/, "").replace(/\/$/, "");
     }
   };
 
   const normalizedCover = normalizeImageUrl(cover);
   const leadingMarkdownImage = content.match(
-    /^\s*!\[[^\]]*\]\(\s*(?:<([^>]+)>|([^\s)]+))(?:\s+["'][^"']*["'])?\s*\)/i,
+    /^\s*(?:\[\s*)?!\[[^\]]*\]\(\s*(?:<([^>]+)>|([^\s)]+))(?:\s+["'][^"']*["'])?\s*\)(?:\s*\]\([^)]*\))?/i,
   );
   const leadingHtmlImage = content.match(
-    /^\s*<img\b[^>]*\bsrc\s*=\s*(?:["']([^"']+)["']|([^\s>]+))[^>]*\/?>/i,
+    /^\s*(?:<(?:figure|div|p)\b[^>]*>\s*)?(?:<a\b[^>]*>\s*)?<img\b[^>]*\bsrc\s*=\s*(?:["']([^"']+)["']|([^\s>]+))[^>]*\/?>\s*(?:<\/a>\s*)?(?:<figcaption\b[^>]*>[\s\S]*?<\/figcaption>\s*)?(?:<\/(?:figure|div|p)>\s*)?/i,
   );
   const leadingImage = leadingMarkdownImage ?? leadingHtmlImage;
   const leadingImageUrl = leadingImage?.[1] ?? leadingImage?.[2];
 
   if (!leadingImage || !leadingImageUrl) return content;
-  if (normalizeImageUrl(leadingImageUrl) !== normalizedCover) return content;
+  if (normalizeImageUrl(leadingImageUrl, cover) !== normalizedCover) return content;
 
   return content.slice(leadingImage[0].length).trimStart();
 }
