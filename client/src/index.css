@@ -1089,6 +1089,7 @@ main .rounded-xl, main .rounded-lg { border-radius:0; }
   position: relative;
   z-index: 1;
   grid-template-columns: minmax(0, 960px);
+  padding-top: clamp(2.5rem, 4vw, 4.5rem);
 }
 
 .article-magazine-grid {
