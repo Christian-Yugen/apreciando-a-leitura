@@ -3,7 +3,7 @@ import { Link } from "wouter";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { ArrowUpRight, BookOpen, Filter, Loader2, Search } from "lucide-react";
-import { trpc } from "@/lib/trpc";
+import { useReviewGenres, useReviews } from "@/lib/queries";
 
 function formatDate(date: Date | string) {
   return new Date(date).toLocaleDateString("pt-BR", { day: "2-digit", month: "short", year: "numeric" });
@@ -12,9 +12,9 @@ function formatDate(date: Date | string) {
 export default function Reviews() {
   const [search, setSearch] = useState("");
   const [genre, setGenre] = useState("all");
-  const { data: genresData } = trpc.reviews.genres.useQuery();
+  const { data: genresData } = useReviewGenres();
   const input = useMemo(() => ({ search: search || undefined, genre: genre === "all" ? undefined : genre }), [search, genre]);
-  const { data, isLoading } = trpc.reviews.list.useQuery(input);
+  const { data, isLoading } = useReviews(input);
   const reviews = data ?? [];
 
   return <div className="editorial-page">

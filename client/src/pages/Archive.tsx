@@ -9,7 +9,7 @@ import {
   Loader2,
   X,
 } from "lucide-react";
-import { trpc } from "@/lib/trpc";
+import { useReviewsByYearMonth, useReviewStats, useReviewYears } from "@/lib/queries";
 import {
   createThemeVariables,
   useCinematicTheme,
@@ -345,8 +345,8 @@ function AnnualShelf({
 }
 
 export default function Archive() {
-  const { isLoading: loadingYears } = trpc.reviews.years.useQuery();
-  const { data: stats } = trpc.reviews.stats.useQuery();
+  const { isLoading: loadingYears } = useReviewYears();
+  const { data: stats } = useReviewStats();
 
   const [selectedYear, setSelectedYear] = useState<number | null>(null);
   const [selectedMonth, setSelectedMonth] = useState<number | null>(null);
@@ -360,16 +360,9 @@ export default function Archive() {
     }
   }, [sortedYears, selectedYear]);
 
-  const queryInput = useMemo(
-    () => ({ year: selectedYear ?? 0, month: selectedMonth ?? undefined }),
-    [selectedYear, selectedMonth],
-  );
-
-  const { data: reviews = [], isLoading } = trpc.reviews.byYearMonth.useQuery(
-    queryInput,
-    {
-      enabled: selectedYear !== null,
-    },
+  const { data: reviews = [], isLoading } = useReviewsByYearMonth(
+    selectedYear,
+    selectedMonth,
   );
 
   const annualReviews = useMemo(

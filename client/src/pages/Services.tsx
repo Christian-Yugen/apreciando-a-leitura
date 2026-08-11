@@ -6,7 +6,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Pen, BookOpen, FileCheck, Sparkles, CheckCircle, Loader2, Send } from "lucide-react";
-import { trpc } from "@/lib/trpc";
+import { useQuoteMutation } from "@/lib/queries";
 import { toast } from "sonner";
 
 const services = [
@@ -41,19 +41,17 @@ export default function Services() {
   const [wordCount, setWordCount] = useState("");
   const [description, setDescription] = useState("");
 
-  const quoteMutation = trpc.quote.submit.useMutation({
-    onSuccess: (data) => {
-      if (data.success) {
-        toast.success("Solicitação enviada com sucesso! Elaise entrará em contato em breve.");
-        setName(""); setEmail(""); setServiceType(""); setWordCount(""); setDescription("");
-      } else {
-        toast.error(data.error || "Erro ao enviar solicitação.");
-      }
-    },
-    onError: () => {
+  const quoteMutation = useQuoteMutation();
+
+  const submitQuote = async () => {
+    try {
+      await quoteMutation.mutateAsync({ name, email, serviceType, wordCount, description });
+      toast.success("Solicitação enviada com sucesso! Elaise entrará em contato em breve.");
+      setName(""); setEmail(""); setServiceType(""); setWordCount(""); setDescription("");
+    } catch {
       toast.error("Erro ao enviar solicitação. Tente novamente ou envie um e-mail direto para elaiselima@gmail.com");
-    },
-  });
+    }
+  };
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -61,7 +59,7 @@ export default function Services() {
       toast.error("Preencha todos os campos obrigatórios.");
       return;
     }
-    quoteMutation.mutate({ name, email, serviceType, wordCount, description });
+    void submitQuote();
   };
 
   return (

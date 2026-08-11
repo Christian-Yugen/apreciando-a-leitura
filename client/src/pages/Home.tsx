@@ -10,7 +10,7 @@ import {
   Sparkles,
   Star,
 } from "lucide-react";
-import { trpc } from "@/lib/trpc";
+import { useReviews, useReviewStats } from "@/lib/queries";
 
 function formatDate(date: Date | string) {
   return new Date(date).toLocaleDateString("pt-BR", {
@@ -61,10 +61,10 @@ function ReviewImage({
 }
 
 export default function Home() {
-  const { data: reviewsData, isLoading } = trpc.reviews.list.useQuery({
+  const { data: reviewsData, isLoading } = useReviews({
     limit: 7,
   });
-  const { data: stats } = trpc.reviews.stats.useQuery();
+  const { data: stats } = useReviewStats();
 
   const reviews = reviewsData ?? [];
   const featured = reviews[0];

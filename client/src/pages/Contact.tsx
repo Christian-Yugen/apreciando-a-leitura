@@ -5,7 +5,7 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
 import { Mail, Loader2, Send, MessageCircle, Sparkles } from "lucide-react";
-import { trpc } from "@/lib/trpc";
+import { useContactMutation } from "@/lib/queries";
 import { toast } from "sonner";
 
 export default function Contact() {
@@ -14,19 +14,17 @@ export default function Contact() {
   const [subject, setSubject] = useState("");
   const [message, setMessage] = useState("");
 
-  const contactMutation = trpc.contact.submit.useMutation({
-    onSuccess: (data) => {
-      if (data.success) {
-        toast.success("Mensagem enviada com sucesso! Elaise responderá em breve.");
-        setName(""); setEmail(""); setSubject(""); setMessage("");
-      } else {
-        toast.error(data.error || "Erro ao enviar mensagem.");
-      }
-    },
-    onError: () => {
+  const contactMutation = useContactMutation();
+
+  const submitContact = async () => {
+    try {
+      await contactMutation.mutateAsync({ name, email, subject, message });
+      toast.success("Mensagem enviada com sucesso! Elaise responderá em breve.");
+      setName(""); setEmail(""); setSubject(""); setMessage("");
+    } catch {
       toast.error("Erro ao enviar mensagem. Tente novamente ou envie um e-mail direto para elaiselima@gmail.com");
-    },
-  });
+    }
+  };
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -34,7 +32,7 @@ export default function Contact() {
       toast.error("Preencha todos os campos.");
       return;
     }
-    contactMutation.mutate({ name, email, subject, message });
+    void submitContact();
   };
 
   return (
