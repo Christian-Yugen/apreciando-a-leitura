@@ -12,7 +12,7 @@ import {
   Quote,
   Tag,
 } from "lucide-react";
-import { trpc } from "@/lib/trpc";
+import { useReview, useReviews } from "@/lib/queries";
 import {
   createThemeVariables,
   useCinematicTheme,
@@ -110,10 +110,8 @@ function removeLeadingCover(content: string, cover?: string | null) {
 
 export default function ReviewDetail() {
   const { id } = useParams<{ id: string }>();
-  const { data: review, isLoading } = trpc.reviews.byId.useQuery({
-    id: Number(id),
-  });
-  const { data: recent = [] } = trpc.reviews.list.useQuery({ limit: 8 });
+  const { data: review, isLoading } = useReview(Number(id));
+  const { data: recent = [] } = useReviews({ limit: 8 });
   const [progress, setProgress] = useState(0);
   const { theme: cinematicTheme } = useCinematicTheme(
     review?.coverImageUrl,

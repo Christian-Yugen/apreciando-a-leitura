@@ -3,10 +3,10 @@ import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/componen
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { BookOpen, ExternalLink, Loader2, ArrowRight, Sparkles } from "lucide-react";
-import { trpc } from "@/lib/trpc";
+import { useBooks } from "@/lib/queries";
 
 export default function MyBooks() {
-  const { data: booksData, isLoading } = trpc.books.list.useQuery();
+  const { data: booksData, isLoading } = useBooks();
   const books = booksData ?? [];
 
   return (
